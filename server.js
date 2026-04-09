@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 8080;
 const app = express();
 app.use(express.static(__dirname));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+app.get("/detail", (req, res) => res.sendFile(path.join(__dirname, "detail.html")));
 
 const httpServer = createServer(app);
 
