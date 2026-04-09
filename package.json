@@ -1,0 +1,13 @@
+{
+  "name": "sketch-relay",
+  "version": "1.0.0",
+  "description": "Socket.io relay for sketch controller",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}

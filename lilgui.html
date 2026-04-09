@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Controller</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/lilgui.js"></script>
+  </head>
+  <body>
+    <script>
+      // ── Socket ─────────────────────────────────────────────────────────────────
+      const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+      const SERVER_URL = isLocal ? "http://localhost:8080" : window.location.origin;
+      const socket = io(SERVER_URL);
+
+      socket.on("connect", () => console.log("[socket] connected"));
+      socket.on("disconnect", () => console.warn("[socket] disconnected"));
+
+      // ── Params ─────────────────────────────────────────────────────────────────
+      const params = {
+        stfeco: 5,
+        stflife: 5,
+        stfgov: 5,
+      };
+
+      // ── GUI ────────────────────────────────────────────────────────────────────
+      const gui = new lil.GUI();
+
+      function onParamsChange() {
+        socket.emit("params", params);
+      }
+
+      for (const key of Object.keys(params)) {
+        gui.add(params, key, 0, 10, 1).onChange(onParamsChange);
+      }
+
+      // ── Receive from other clients ─────────────────────────────────────────────
+      socket.on("params", (incoming) => {
+        Object.assign(params, incoming);
+        gui.controllersRecursive().forEach((c) => c.updateDisplay());
+      });
+    </script>
+  </body>
+</html>

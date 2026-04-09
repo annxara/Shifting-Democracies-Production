@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Controller</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="gui.css" />
+  </head>
+  <body>
+    <div id="status">disconnected</div>
+
+    <div>
+      stfeco: <input type="range" id="stfeco" min="0" max="10" step="1" value="5" />
+      <span id="stfeco-val">5</span>
+    </div>
+
+    <div>
+      stflife: <input type="range" id="stflife" min="0" max="10" step="1" value="5" />
+      <span id="stflife-val">5</span>
+    </div>
+
+    <div>
+      stfgov: <input type="range" id="stfgov" min="0" max="10" step="1" value="5" />
+      <span id="stfgov-val">5</span>
+    </div>
+
+    <script>
+      const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+      const SERVER_URL = isLocal ? "http://localhost:8080" : window.location.origin;
+      const socket = io(SERVER_URL);
+
+      socket.on("connect", () => (document.getElementById("status").textContent = "connected"));
+      socket.on("disconnect", () => (document.getElementById("status").textContent = "disconnected"));
+
+      const params = { stfeco: 5, stflife: 5, stfgov: 5 };
+
+      ["stfeco", "stflife", "stfgov"].forEach((key) => {
+        document.getElementById(key).addEventListener("input", function () {
+          document.getElementById(key + "-val").textContent = this.value;
+          params[key] = Number(this.value);
+          socket.emit("params", params);
+        });
+      });
+
+      socket.on("params", (incoming) => {
+        Object.assign(params, incoming);
+        ["stfeco", "stflife", "stfgov"].forEach((key) => {
+          document.getElementById(key).value = params[key];
+          document.getElementById(key + "-val").textContent = params[key];
+        });
+      });
+    </script>
+  </body>
+</html>

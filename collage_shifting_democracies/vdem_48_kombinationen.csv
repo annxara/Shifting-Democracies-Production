@@ -1,0 +1,58 @@
+﻿V-Dem Interpretationsrahmen – EDI 3-stufig, Rest binär (48 Kombinationen);;;;;;
+H = Hoch (>0.6)   |   M = Mittel (0.4–0.6)   |   N = Niedrig (<0.4);;;;;;
+EDI NIEDRIG – Basis fehlt  (EDI < 0.4);;;;;;
+EDI;Liberal;Participatory;Egalitarian;Deliberative;Regimetyp;Interpretation
+N;N;N;N;N;Geschlossenes Autoritäres Regime;Keine Wahlen, keine Freiheiten, kein Diskurs, keine Gleichheit. Vollständige Unterdrückung.
+N;N;N;N;H;Deliberativer Autoritarismus;Öffentlicher Diskurs ohne echte Wahlen oder Freiheiten. Theoretischer Grenzfall.
+N;N;N;H;N;Egalitärer Autoritarismus;Soziale Gleichheit von oben durchgesetzt, ohne politische Freiheit. Frühe sozialistische Staaten.
+N;N;N;H;H;Egalitärer Diskursautoritarismus;Gleichheit und Begründungspflicht existieren, aber politische Grundfreiheiten fehlen.
+N;N;H;N;N;Mobilisierungsautoritarismus;Massenpartizipation zur Legitimation, ohne echte Wahlen oder Freiheiten. Einparteienstaat.
+N;N;H;N;H;Deliberativer Mobilisierungsstaat;Öffentlicher Diskurs und Partizipation, aber ohne Freiheitsrechte oder faire Wahlen.
+N;N;H;H;N;Populistischer Egalitarismus;Mobilisierung breiter Massen mit Gleichheitsversprechen, ohne Rechtsstaat oder freie Wahlen.
+N;N;H;H;H;Partizipativ-egalitärer Diskursstaat ohne Wahlen;Alles außer fairen Wahlen vorhanden. Erinnert an deliberative Rätesysteme.
+N;H;N;N;N;Liberaler Autoritarismus;Rechtsstaatlichkeit existiert, aber ohne demokratische Legitimation. Technokratische oder monarchische Systeme.
+N;H;N;N;H;Technokratischer Diskursstaat;Rationale Entscheidungsfindung und Rechtsstaat, aber ohne Wahlen oder breite Beteiligung.
+N;H;N;H;N;Elitärer Liberalismus;Freiheiten und Gleichheit für Privilegierte, aber keine demokratische Öffnung.
+N;H;N;H;H;Deliberativer Liberalismus ohne Partizipation;Freiheit, Gleichheit und Diskurs, aber Bürger bleiben passiv.
+N;H;H;N;N;Partizipativer Rechtsstaat ohne Demokratie;Bürger können sich einbringen, Rechte geschützt, aber Wahlen fehlen oder nicht kompetitiv.
+N;H;H;N;H;Liberale Partizipationsdemokratie ohne Gleichheit;Diskurs, Beteiligung und Rechtsstaat, aber strukturelle Ungleichheiten bleiben.
+N;H;H;H;N;Vollständiger Autoritarismus mit sozialen Rechten;Fast alles außer fairen Wahlen vorhanden. Sehr instabiles Gleichgewicht.
+N;H;H;H;H;Vollständige Nicht-Wahldemokratie;Theoretischer Grenzfall: alle Qualitäten ohne das Kernmerkmal Wahlen.
+;;;;;;
+EDI MITTEL – Übergangszone  (EDI 0.4 – 0.6);;;;;;
+EDI;Liberal;Participatory;Egalitarian;Deliberative;Regimetyp;Interpretation
+M;N;N;N;N;Fragmentierter Wahlstaat;Wahlen existieren ansatzweise, sind aber stark eingeschränkt. Alle anderen Qualitäten fehlen – instabiles Übergangsregime.
+M;N;N;N;H;Deliberativer Übergangsstaat;Öffentlicher Diskurs bei schwachen Wahlen. Deliberation ohne institutionelle Verankerung.
+M;N;N;H;N;Egalitärer Übergangsstaat;Formale Gleichheit bei schwachen Wahlen. Gleichheitsversprechen ohne demokratische Substanz.
+M;N;N;H;H;Egalitärer Diskursstaat im Übergang;Schwache Wahlen mit Gleichheit und Deliberation. Substanz ohne demokratische Form.
+M;N;H;N;N;Mobilisierter Übergangsstaat;Schwache Wahlen mit aktiver Zivilgesellschaft. Partizipation übersteigt die institutionelle Reife.
+M;N;H;N;H;Deliberativer Partizipationsstaat im Übergang;Schwache Wahlen, Zivilgesellschaft und Diskurs aktiv. Institutionelle Lücken bleiben groß.
+M;N;H;H;N;Partizipativer Egalitarismus im Übergang;Schwache Wahlen mit Partizipation und Gleichheit. Populistische Mobilisierung ohne institutionelle Basis.
+M;N;H;H;H;Partizipativ-egalitärer Diskursstaat im Übergang;Schwache Wahlen, aber breite Beteiligung, Gleichheit und Diskurs. Rechtsstaat als verbleibendes Defizit.
+M;H;N;N;N;Liberalisierungsanlauf;Erste liberale Strukturen entstehen parallel zu schwachen Wahlen. Rechtsstaat im Aufbau, aber ohne Breite.
+M;H;N;N;H;Deliberativer Liberalismus im Übergang;Schwache Wahlen, aber Rechtsstaat und Diskursqualität entstehen. Gefahr der Demokratie ohne Masse.
+M;H;N;H;N;Liberaler Egalitarismus im Übergang;Schwache Wahlen mit Rechtsstaat und sozialer Gleichheit. Elitäre Demokratisierung von oben.
+M;H;N;H;H;Deliberativer Egalitarismus im Übergang;Schwache Wahlen mit liberalem Rechtsstaat, Gleichheit und Diskurs. Partizipation als fehlendes Element.
+M;H;H;N;N;Partizipativer Liberalismus im Übergang;Schwache Wahlen, aber Rechtsstaat und Zivilgesellschaft im Aufbau. Typisch für Demokratisierungsprozesse.
+M;H;H;N;H;Deliberativ-partizipativer Liberalismus im Übergang;Schwache Wahlen mit Rechtsstaat, Partizipation und Diskurs. Ungleichheit als verbleibendes Defizit.
+M;H;H;H;N;Pluralistischer Übergangsstaat;Schwache Wahlen, aber Rechtsstaat, Partizipation und Gleichheit entwickelt. Diskurs fehlt noch.
+M;H;H;H;H;Reifende Demokratie;Schwache Wahlen trotz hoher Qualität in allen anderen Dimensionen. Institutionelle Konsolidierung noch ausstehend.
+;;;;;;
+EDI HOCH – Wahlen existieren  (EDI > 0.6);;;;;;
+EDI;Liberal;Participatory;Egalitarian;Deliberative;Regimetyp;Interpretation
+H;N;N;N;N;Elektoraler Autoritarismus;Wahlen als Fassade. Keine Freiheiten, kein Diskurs, keine Gleichheit. Regime nutzt Wahlen zur Legitimation.
+H;N;N;N;H;Elektoraler Populismus;Wahlen + öffentlicher Diskurs, aber ohne Freiheitsrechte, Gleichheit oder Zivilgesellschaft. Charismatische Führung.
+H;N;N;H;N;Egalitärer Elektoralismus;Wahlen mit formaler Gleichheit, aber ohne Freiheitsrechte oder echten Diskurs. Gleichheit als Staatsversprechen.
+H;N;N;H;H;Egalitärer Diskurselektoralismus;Wahlen, Gleichheit und deliberative Qualität, aber ohne Rechtsstaat und ohne breite Partizipation.
+H;N;H;N;N;Partizipativer Elektoralismus;Wahlen + aktive Zivilgesellschaft, aber Rechtsstaatlichkeit und Gleichheit fehlen. Oft in jungen Demokratien.
+H;N;H;N;H;Deliberative Partizipationsdemokratie;Wahlen, Zivilgesellschaft und Diskursqualität, aber strukturelle Ungleichheiten und schwacher Rechtsstaat.
+H;N;H;H;N;Partizipativer Egalitarismus;Wahlen, breite Beteiligung und Gleichheit, aber Rechtsstaat und Diskurs fehlen. Populistische Tendenzen möglich.
+H;N;H;H;H;Partizipativ-egalitäre Diskursdemokratie;Wahlen, Beteiligung, Gleichheit und Diskurs, aber Rechtsstaatlichkeit und Freiheitsrechte schwach.
+H;H;N;N;N;Liberale Minimaldemokratie;Wahlen + Rechtsstaat + Freiheitsrechte, aber elitär, ungleich, ohne breiten Diskurs. Klassischer Schumpeter-Typ.
+H;H;N;N;H;Liberale Diskursdemokratie;Wahlen, Rechtsstaat und deliberative Qualität, aber wenig Partizipation und Ungleichheit. Elitäre Konsensdemokratie.
+H;H;N;H;N;Liberale Gleichheitsdemokratie;Wahlen, Freiheitsrechte und soziale Gleichheit, aber Bürger passiv und Diskurs schwach.
+H;H;N;H;H;Deliberativer Egalitarismus;Wahlen, Freiheiten, Gleichheit und Diskurs, aber Bürger passiv. Sozialstaat mit schwacher Zivilgesellschaft.
+H;H;H;N;N;Westliche Minimaldemokratie;Wahlen, Rechtsstaat, Partizipation, aber strukturelle Ungleichheiten und schwacher Diskurs.
+H;H;H;N;H;Liberale Deliberativdemokratie;Wahlen, Rechtsstaat, Partizipation und Diskurs, aber strukturelle Ungleichheiten bleiben. Nordwestliche Demokratien.
+H;H;H;H;N;Pluralistische Demokratie ohne Diskursqualität;Wahlen, Rechtsstaat, Partizipation und Gleichheit, aber Entscheidungen ohne inklusiven Begründungsprozess.
+H;H;H;H;H;Vollständige Demokratie;"Alle fünf Dimensionen hoch. Idealtypus; kein reales Land erfüllt dies vollständig."
