@@ -36,75 +36,56 @@ function preload() {
   }
 }
 
-// this function makes possible to use different reorganize the data without changing the rest of the code, as long as it can be transformed into an array of { country, years } objects.
+// Reorganize data without changing the rest of the code.
 function toCountryArray(rawData) {
-  // Handle direct array format: [{ country, years }, ...]
-  if (Array.isArray(rawData)) {
-    return rawData;
-  }
-
-  // Handle wrapped format: { data: [...] }
-  if (rawData && Array.isArray(rawData.data)) {
-    return rawData.data;
-  }
-
-  // Handle object-map format: { "0": {...}, "1": {...} }
+  if (Array.isArray(rawData)) return rawData;
+  if (rawData && Array.isArray(rawData.data)) return rawData.data;
   if (rawData && typeof rawData === "object") {
     const values = Object.values(rawData);
     if (values.length > 0 && values.every((v) => v && typeof v === "object" && "country" in v && "years" in v)) {
       return values;
     }
   }
-
-  // Unknown format -> safe fallback.
   return [];
 }
 
 function setup() {
-  // Create drawing surface and ensure flower placement uses center anchors.
   createCanvas(980, 760);
   imageMode(CENTER);
 
-  // Normalize JSON shape once at startup.
   countryData = toCountryArray(countryData);
 
-  // Resize flower icons once to avoid resizing every frame.
   for (let i = 0; i < flowerImages.length; i++) {
     flowerImages[i].resize(42, 0);
   }
 
-  // Build initial filtered list and start real-time syncing.
   applyFilterAndResetIndex();
   connectSocket();
 }
 
 function draw() {
-  // Redraw full frame each tick.
   background("#101015");
 
-  // State 1: data still unavailable.
   if (!countryData || countryData.length === 0) {
     drawLoadingState();
     return;
   }
 
-  // State 2: no countries match selected filter values.
   if (filteredCountries.length === 0) {
     drawNoMatchState();
     return;
   }
 
-  // State 3: render current country card.
   const country = filteredCountries[countryIndex];
   const latest = getLatestYearEntry(country.years);
 
   drawHeader(country, latest);
-  drawIndicators(latest);
+  drawTree(latest);      // Replaces drawIndicators
+  drawLegend(latest);    // New legend function
   drawFooter();
 }
 
 function drawHeader(country, latest) {
-  // Country name + most recent year label.
   fill("#f7f7f7");
   noStroke();
   textAlign(LEFT, TOP);
@@ -117,49 +98,89 @@ function drawHeader(country, latest) {
   text("Jahr: " + latest.year + " (neuester Wert)", 40, 74);
 }
 
-function drawIndicators(latest) {
-  // Layout constants for indicator rows and flower icon positions.
-  const startY = 150;
-  const rowGap = 132;
-  const flowerStartX = 390;
-  const flowerGap = 52;
+function drawTree(latest) {
+  const cx = width / 2;
+  const cy = height / 2 - 60; // Center of the tree canopy
+  const canopyRadius = 170;   // How wide the flowers spread
+
+  // 1. Draw the Trunk
+  stroke("#3d312b"); 
+  strokeWeight(24);
+  strokeCap(ROUND);
+  line(cx, cy + 80, cx, height - 160);
+
+  // 2. Draw a few stylized branches under the flowers
+  strokeWeight(12);
+  line(cx, cy + 60, cx - 70, cy - 20);
+  line(cx, cy + 80, cx + 80, cy - 10);
+  line(cx, cy + 20, cx - 40, cy + 60);
+  line(cx, cy + 40, cx + 60, cy + 50);
+
+  // 3. Draw the Flowers
+  // We use a fixed randomSeed so the random positions don't jump around every frame.
+  randomSeed(42); 
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
-    const y = startY + i * rowGap;
-
-    // Convert 0..1 democracy value into 0..10 score and flower count.
+    
     const rawValue = Number(latest[conf.key]);
     const score01 = Number.isFinite(rawValue) ? constrain(rawValue, 0, 1) : 0;
     const score10 = score01 * 10;
     const flowerCount = Math.round(score10);
 
-    fill("#e8eaf0");
-    noStroke();
-    textAlign(LEFT, CENTER);
-    textSize(20);
-    text(conf.label, 40, y);
-
-    textSize(16);
-    fill("#a8adbb");
-    text(conf.key + ": " + nf(score10, 1, 1) + " / 10", 40, y + 30);
-
-    // Draw one flower per rounded score point.
+    // Draw the calculated amount of flowers for this category
     for (let n = 0; n < flowerCount; n++) {
-      const x = flowerStartX + n * flowerGap;
-      image(flowerImages[i], x, y + 8);
+      // Pick a random angle and distance within the circular canopy
+      const angle = random(TWO_PI);
+      const radius = canopyRadius * sqrt(random(1)); // sqrt ensures even distribution
+      
+      const x = cx + radius * cos(angle);
+      const y = cy + radius * sin(angle);
+
+      image(flowerImages[i], x, y);
     }
   }
 }
 
+function drawLegend(latest) {
+  const legendY = height - 110;
+  const totalWidth = 860;
+  const startX = (width - totalWidth) / 2; // Center the legend horizontally
+  const spacing = totalWidth / indicatorConfig.length;
+
+  textAlign(LEFT, CENTER);
+  noStroke();
+
+  for (let i = 0; i < indicatorConfig.length; i++) {
+    const conf = indicatorConfig[i];
+    const x = startX + i * spacing;
+
+    // Calculate score for display
+    const rawValue = Number(latest[conf.key]);
+    const score01 = Number.isFinite(rawValue) ? constrain(rawValue, 0, 1) : 0;
+    const score10 = score01 * 10;
+
+    // Draw example flower
+    image(flowerImages[i], x, legendY);
+
+    // Draw the indicator label
+    fill("#e8eaf0");
+    textSize(15);
+    text(conf.label, x + 30, legendY - 10);
+
+    // Draw the exact score text below the label
+    fill("#a8adbb");
+    textSize(13);
+    text(nf(score10, 1, 1) + " / 10", x + 30, legendY + 12);
+  }
+}
+
 function drawFooter() {
-  // Help text + live socket status indicator.
   fill("#8d93a3");
   noStroke();
   textAlign(LEFT, BOTTOM);
   textSize(15);
-  text("<- / -> : Land wechseln", 40, height - 56);
-  text("Skala: 0.0-1.0 wird auf 0-10 umgerechnet, dann gerundet", 40, height - 32);
+  text("<- / -> : Land wechseln", 40, height - 32);
 
   const statusText = socketConnected ? "Socket: verbunden" : "Socket: getrennt";
   fill(socketConnected ? "#7ee787" : "#ff7b72");
@@ -168,7 +189,6 @@ function drawFooter() {
 }
 
 function drawLoadingState() {
-  // Fallback UI while waiting for JSON preload.
   fill(255);
   noStroke();
   textAlign(CENTER, CENTER);
@@ -177,7 +197,6 @@ function drawLoadingState() {
 }
 
 function drawNoMatchState() {
-  // Message shown when no country matches current parameter combination.
   fill(220);
   noStroke();
   textAlign(CENTER, CENTER);
@@ -194,7 +213,6 @@ function drawNoMatchState() {
 }
 
 function getLatestYearEntry(years) {
-  // Return safe defaults if year data is missing.
   if (!years || years.length === 0) {
     return {
       year: "n/a",
@@ -205,7 +223,6 @@ function getLatestYearEntry(years) {
     };
   }
 
-  // Find the entry with the largest year value.
   let latest = years[0];
   for (let i = 1; i < years.length; i++) {
     if (Number(years[i].year) > Number(latest.year)) {
@@ -216,21 +233,13 @@ function getLatestYearEntry(years) {
 }
 
 function findMatchingYear(country, activeParams) {
-  // Guard against malformed country records.
-  if (!country || !country.years) {
-    return null;
-  }
+  if (!country || !country.years) return null;
 
-  // Exact matching for now; increase tolerance for fuzzy matching.
   const tolerance = 0;
   return (
     country.years.find((details) => {
-      // Explicitly skip 2025 values.
-      if (Number(details.year) === 2025) {
-        return false;
-      }
+      if (Number(details.year) === 2025) return false;
 
-      // Country is considered a match when all three ESS params align.
       return (
         details.stfeco !== undefined &&
         Math.abs(Number(details.stfeco) - activeParams.stfeco) <= tolerance &&
@@ -244,7 +253,6 @@ function findMatchingYear(country, activeParams) {
 }
 
 function applyFilterAndResetIndex() {
-  // Re-normalize to stay robust even if data source shape changes.
   const countries = toCountryArray(countryData);
   if (countries.length === 0) {
     filteredCountries = [];
@@ -252,17 +260,13 @@ function applyFilterAndResetIndex() {
     return;
   }
 
-  // Keep only countries with at least one matching year; restart at first result.
   countryData = countries;
   filteredCountries = countryData.filter((country) => findMatchingYear(country, params));
   countryIndex = 0;
 }
 
 function keyPressed() {
-  // Keyboard navigation through filtered countries.
-  if (filteredCountries.length === 0) {
-    return;
-  }
+  if (filteredCountries.length === 0) return;
 
   if (keyCode === RIGHT_ARROW) {
     countryIndex = (countryIndex + 1) % filteredCountries.length;
@@ -274,7 +278,6 @@ function keyPressed() {
 }
 
 function connectSocket() {
-  // Create socket and react to connection lifecycle.
   socket = io(SERVER_URL);
 
   socket.on("connect", () => {
@@ -288,7 +291,6 @@ function connectSocket() {
   });
 
   socket.on("params", (incoming) => {
-    // Update local filters from controller, then refresh results.
     Object.assign(params, {
       stfeco: Number(incoming.stfeco),
       stflife: Number(incoming.stflife),
