@@ -29,6 +29,19 @@ const indicatorConfig = [
   { key: "v2x_delibdem", label: "Deliberative Democracy", image: "pictures/forgetmenot_yellow.png" },
 ];
 
+// TREE SETTINGS (easy to tweak)
+// trunkMin / trunkMax: make the whole tree shorter or taller.
+// depthMin / depthMax: controls how many branch levels are drawn.
+// spreadMin / spreadMax: controls how wide branches open.
+const TREE_SETTINGS = {
+  trunkMin: 125,
+  trunkMax: 175,
+  depthMin: 3,
+  depthMax: 5,
+  spreadMin: 12,
+  spreadMax: 21,
+};
+
 function preload() {
   // Load the data file and the flower pictures first.
   countryData = loadJSON("ess_vdem_country_year_variables 2.json");
@@ -133,27 +146,33 @@ function drawTree(latest) {
 }
 
 function drawRecursiveTree(counts) {
-  // Draw one white tree whose shape depends on the flower totals.
+  // Draw one white tree. More flowers = bigger tree and more branches.
   const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
-  const trunkLength = map(totalFlowers, 0, 40, 175, 240);
-  const branchDepth = Math.max(3, Math.min(6, Math.ceil(totalFlowers / 7)));
-  const branchSpread = map(totalFlowers, 0, 40, 16, 28);
+
+  // 1) Main size of the tree.
+  const trunkLength = map(totalFlowers, 0, 40, TREE_SETTINGS.trunkMin, TREE_SETTINGS.trunkMax);
+
+  // 2) Amount of branches (depth of recursion).
+  const branchDepth = constrain(Math.floor(map(totalFlowers, 0, 40, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax)), TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax);
+
+  // 3) How much branches spread left/right.
+  const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
 
   push();
-  translate(width / 2, height - 145);
+  translate(width / 2, height - 130);
   stroke(255);
   noFill();
-  drawBranch(trunkLength, branchDepth, branchSpread, counts, 0);
+  drawBranch(trunkLength, branchDepth, branchSpread, counts);
   pop();
 }
 
-function drawBranch(len, depth, spread, counts, level) {
+function drawBranch(len, depth, spread, counts) {
   // Draw one branch, then split it into two smaller branches.
   if (len < 8 || depth <= 0) {
     return;
   }
 
-  strokeWeight(map(len, 10, 240, 1, 14));
+  strokeWeight(map(len, 10, TREE_SETTINGS.trunkMax, 1, 10));
   line(0, 0, 0, -len);
   translate(0, -len);
 
@@ -165,18 +184,18 @@ function drawBranch(len, depth, spread, counts, level) {
   const rightFlowers = counts[1] + counts[3];
   const leftAngle = map(leftFlowers, 0, 20, spread - 5, spread + 7);
   const rightAngle = map(rightFlowers, 0, 20, spread - 5, spread + 7);
-  const leftLen = len * map(leftFlowers, 0, 20, 0.66, 0.84);
-  const rightLen = len * map(rightFlowers, 0, 20, 0.66, 0.84);
-  const nextSpread = spread * 0.86;
+  const leftLen = len * map(leftFlowers, 0, 20, 0.62, 0.78);
+  const rightLen = len * map(rightFlowers, 0, 20, 0.62, 0.78);
+  const nextSpread = spread * 0.88;
 
   push();
   rotate(leftAngle);
-  drawBranch(leftLen, depth - 1, nextSpread, counts, level + 1);
+  drawBranch(leftLen, depth - 1, nextSpread, counts);
   pop();
 
   push();
   rotate(-rightAngle);
-  drawBranch(rightLen, depth - 1, nextSpread, counts, level + 1);
+  drawBranch(rightLen, depth - 1, nextSpread, counts);
   pop();
 }
 
