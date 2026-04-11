@@ -13,6 +13,7 @@ let countryIndex = 0;
 let flowerImages = [];
 let flowerCloud = [];
 let flowerCloudKey = "";
+let randomPhaseStartsAt = 0;
 let clusterAnimationStartsAt = 0;
 const ROTATE_CANVAS_90 = true;
 
@@ -150,7 +151,8 @@ function drawTree(latest) {
 
   if (flowerCloud.length === 0) {
     flowerCloud = buildMemoryField(latest);
-    clusterAnimationStartsAt = millis() + 2000;
+    randomPhaseStartsAt = millis();
+    clusterAnimationStartsAt = randomPhaseStartsAt + 2000;
   }
 
   updateAndDrawFlowers();
@@ -194,6 +196,8 @@ function buildMemoryField(latest) {
         flowerIndex: i,
         size,
         rotation: random(-1, 1),
+        growDelay: random(0, 700),
+        growDuration: random(550, 1050),
         settled: false,
       });
     }
@@ -362,7 +366,13 @@ function updateAndDrawFlowers() {
 }
 
 function drawSingleFlower(f) {
-  // Draw one flower.
+  // Draw one flower with a short grow-in animation at the start.
+  const elapsedSinceRandomStart = millis() - randomPhaseStartsAt;
+  const growProgress = constrain((elapsedSinceRandomStart - f.growDelay) / f.growDuration, 0, 1);
+  const smoothGrow = growProgress * growProgress * (3 - 2 * growProgress);
+  const drawSize = f.size * smoothGrow;
+
+  if (drawSize <= 0.5) return;
 
   push();
 
@@ -376,8 +386,8 @@ function drawSingleFlower(f) {
     flowerImages[f.flowerIndex],
     0,
     0,
-    f.size,
-    f.size
+    drawSize,
+    drawSize
   );
 
   pop();
