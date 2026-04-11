@@ -18,6 +18,8 @@ let clusterAnimationStartsAt = 0;
 const ROTATE_CANVAS_90 = true;
 const CLUSTER_DELAY_MS = 2000;
 const CLUSTER_MOVE_DURATION_MS = 4200;
+const HEADER_BLOCK_HEIGHT = 122;
+const LEGEND_BLOCK_HEIGHT = 258;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -134,17 +136,26 @@ function draw() {
 }
 
 function drawHeader(country, latest) {
-  // Show the country name and year at the top.
-  fill("#f7f7f7");
+  // Styled header panel with stronger title hierarchy.
+  const panelX = 24;
+  const panelY = 20;
+  const panelW = width - 48;
+  const panelH = HEADER_BLOCK_HEIGHT - 26;
+
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#141b2ccc", "#2b3448");
+
+  fill("#f7f9ff");
   noStroke();
   textAlign(LEFT, TOP);
+  textStyle(BOLD);
 
-  textSize(34);
-  text(country.country, 40, 28);
+  textSize(43);
+  text(country.country, panelX + 22, panelY + 16);
 
+  textStyle(NORMAL);
   textSize(18);
-  fill("#b8bcc8");
-  text("Jahr: " + latest.year + " (neuester Wert)", 40, 74);
+  fill("#b6bfd4");
+  text("Jahr: " + latest.year + " (neuester Wert)", panelX + 24, panelY + 70);
 }
 
 function drawTree(latest) {
@@ -170,8 +181,8 @@ function buildMemoryField(latest) {
   const bounds = {
     minX: 70,
     maxX: width - 70,
-    minY: 150,
-    maxY: height - 290,
+    minY: HEADER_BLOCK_HEIGHT + 34,
+    maxY: height - LEGEND_BLOCK_HEIGHT - 26,
   };
 
   // Build evenly spaced anchors for all indicators inside the flower area.
@@ -424,32 +435,44 @@ function drawLegend(latest) {
   const vDemIndicators = indicatorConfig.filter((item) => item.key.startsWith("v2x_"));
   const essIndicators = indicatorConfig.filter((item) => item.key.startsWith("stf"));
 
-  const legendTop = height - 250;
-  const startX = 60;
-  const contentWidth = width - 120;
+  const legendTop = height - LEGEND_BLOCK_HEIGHT + 16;
+  const panelX = 24;
+  const panelY = height - LEGEND_BLOCK_HEIGHT;
+  const panelW = width - 48;
+  const panelH = LEGEND_BLOCK_HEIGHT - 18;
+  const startX = panelX + 18;
+  const contentWidth = panelW - 36;
   const columnWidth = contentWidth / 2;
-  const rowHeight = 48;
+  const rowHeight = 52;
+
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#141b2ccc", "#2b3448");
+
+  stroke("#2f3850");
+  strokeWeight(1);
+  line(startX + columnWidth - 12, legendTop - 6, startX + columnWidth - 12, panelY + panelH - 14);
 
   textAlign(LEFT, CENTER);
   noStroke();
 
-  fill("#f0f3fa");
-  textSize(15);
+  fill("#f1f5ff");
+  textStyle(BOLD);
+  textSize(17);
   text("V-Dem Values", startX, legendTop - 26);
   text("ESS Values", startX + columnWidth, legendTop - 26);
+  textStyle(NORMAL);
 
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
 
   for (let row = 0; row < rows; row++) {
-    drawLegendRow(vDemIndicators[row], startX, row, rowHeight, latest);
-    drawLegendRow(essIndicators[row], startX + columnWidth, row, rowHeight, latest);
+    drawLegendRow(vDemIndicators[row], startX, legendTop, row, rowHeight, latest);
+    drawLegendRow(essIndicators[row], startX + columnWidth, legendTop, row, rowHeight, latest);
   }
 }
 
-function drawLegendRow(configItem, baseX, row, rowHeight, latest) {
+function drawLegendRow(configItem, baseX, legendTop, row, rowHeight, latest) {
   if (!configItem) return;
 
-  const y = (height - 250) + row * rowHeight;
+  const y = legendTop + row * rowHeight;
   const index = indicatorConfig.findIndex((item) => item.key === configItem.key);
   const flowerCount = getFlowerCount(latest, configItem.key);
 
@@ -457,28 +480,39 @@ function drawLegendRow(configItem, baseX, row, rowHeight, latest) {
   image(flowerImages[index], baseX + 12, y, 30, 30);
 
   // Show label.
-  fill("#e8eaf0");
-  textSize(13);
+  fill("#e8ecf8");
+  textStyle(BOLD);
+  textSize(14);
   text(configItem.label, baseX + 34, y - 9);
 
   // Show real flower count currently rendered in the garden.
-  fill("#9ea4b4");
-  textSize(12);
+  fill("#98a1b7");
+  textStyle(NORMAL);
+  textSize(13);
   text(String(flowerCount), baseX + 34, y + 10);
 }
 
 function drawFooter() {
-  // Show the key help text and socket status.
-  fill("#8d93a3");
+  // Subtle footer for navigation and socket status.
+  fill("#a2a9bc");
   noStroke();
   textAlign(LEFT, BOTTOM);
-  textSize(15);
-  text("<- / -> : Land wechseln", 40, height - 32);
+  textSize(16);
+  text("<- / -> : Land wechseln", 34, height - 12);
 
   const statusText = socketConnected ? "Socket: verbunden" : "Socket: getrennt";
   fill(socketConnected ? "#7ee787" : "#ff7b72");
   textAlign(RIGHT, BOTTOM);
-  text(statusText, width - 40, height - 32);
+  text(statusText, width - 34, height - 12);
+}
+
+function drawUiPanel(x, y, w, h, radius, fillColor, strokeColor) {
+  push();
+  stroke(strokeColor);
+  strokeWeight(1);
+  fill(fillColor);
+  rect(x, y, w, h, radius);
+  pop();
 }
 
 function drawLoadingState() {
