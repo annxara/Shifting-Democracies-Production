@@ -203,7 +203,7 @@ function drawBranchPath(startX, startY, endX, endY, curl) {
 }
 
 function drawOrganicBranches(baseX, topY, canopyCenterX, canopyCenterY) {
-  // Draw several branches that spread out.
+  // Draw several branches that spread out
   const branches = [
     { x: baseX - 10, y: topY + 190, ex: canopyCenterX - 150, ey: canopyCenterY + 90, curl: -28 },
     { x: baseX + 6, y: topY + 165, ex: canopyCenterX + 140, ey: canopyCenterY + 55, curl: 24 },
