@@ -159,6 +159,7 @@ function buildMemoryField(latest) {
   const flowers = [];
   const totalFlowerCount = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
   const flowerSize = getFlowerVisualSize(totalFlowerCount);
+  const clusterRadius = constrain(map(totalFlowerCount, 20, 80, 112, 90), 86, 116);
 
   const centerX = width / 2;
   const centerY = height / 2 + 20;
@@ -180,13 +181,15 @@ function buildMemoryField(latest) {
     // One flower per rounded score point (0..10), same mapping as before.
     for (let n = 0; n < count; n++) {
       const size = flowerSize;
-      const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, 130);
+      const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, clusterRadius);
 
       flowers.push({
         x: centerX + random(-20, 20),
         y: centerY + random(-20, 20),
         tx: target.x,
         ty: target.y,
+        ax: anchor.x,
+        ay: anchor.y,
 
         flowerIndex: i,
         size,
@@ -195,6 +198,8 @@ function buildMemoryField(latest) {
       });
     }
   }
+
+  resolveTargetOverlaps(flowers, bounds);
 
   return flowers;
 }
@@ -224,80 +229,104 @@ function buildGridAnchors(anchorCount, bounds) {
 }
 
 function pickGardenPositionNearAnchor(existingFlowers, size, bounds, anchor, clusterRadius) {
-  // Pick near a color anchor first, with overlap protection.
+  // Keep each variable near its own anchor and prevent overlaps.
   const margin = size * 0.48;
   const minX = bounds.minX + margin;
   const maxX = bounds.maxX - margin;
   const minY = bounds.minY + margin;
   const maxY = bounds.maxY - margin;
-  const maxAttempts = 340;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const a = random(TWO_PI);
-    const r = clusterRadius * sqrt(random());
-    const x = constrain(anchor.x + cos(a) * r, minX, maxX);
-    const y = constrain(anchor.y + sin(a) * r, minY, maxY);
-
-    const overlaps = existingFlowers.some((f) => {
-      const required = (size + f.size) * 0.56;
-      return dist(x, y, f.tx, f.ty) < required;
-    });
-
-    if (!overlaps) {
-      return { x, y };
-    }
-  }
-
-  // If local area is crowded, use global fallback.
-  return pickGardenPosition(existingFlowers, size, bounds);
-}
-
-function pickGardenPosition(existingFlowers, size, bounds) {
-  // Pick a random garden position that does not overlap existing targets.
-  const margin = size * 0.48;
-  const minX = bounds.minX + margin;
-  const maxX = bounds.maxX - margin;
-  const minY = bounds.minY + margin;
-  const maxY = bounds.maxY - margin;
-  const maxAttempts = 300;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    const x = random(minX, maxX);
-    const y = random(minY, maxY);
-
-    const overlaps = existingFlowers.some((f) => {
-      const required = (size + f.size) * 0.56;
-      return dist(x, y, f.tx, f.ty) < required;
-    });
-
-    if (!overlaps) {
-      return { x, y };
-    }
-  }
-
-  // Fallback if space is crowded.
-  let bestX = random(minX, maxX);
-  let bestY = random(minY, maxY);
+  const rings = 9;
+  const triesPerRing = 70;
+  const ringStep = Math.max(12, size * 0.32);
+  let bestX = anchor.x;
+  let bestY = anchor.y;
   let bestClearance = -Infinity;
 
-  for (let i = 0; i < 120; i++) {
-    const x = random(minX, maxX);
-    const y = random(minY, maxY);
+  for (let ring = 0; ring < rings; ring++) {
+    const currentRadius = clusterRadius + ring * ringStep;
 
-    let nearest = Infinity;
-    for (const f of existingFlowers) {
-      const d = dist(x, y, f.tx, f.ty) - (size + f.size) * 0.56;
-      if (d < nearest) nearest = d;
-    }
+    for (let attempt = 0; attempt < triesPerRing; attempt++) {
+      const a = random(TWO_PI);
+      const r = currentRadius * sqrt(random());
+      const x = constrain(anchor.x + cos(a) * r, minX, maxX);
+      const y = constrain(anchor.y + sin(a) * r, minY, maxY);
 
-    if (nearest > bestClearance) {
-      bestClearance = nearest;
-      bestX = x;
-      bestY = y;
+      let hasOverlap = false;
+      let nearestClearance = Infinity;
+
+      for (const f of existingFlowers) {
+        const required = (size + f.size) * 0.6;
+        const clearance = dist(x, y, f.tx, f.ty) - required;
+        if (clearance < 0) {
+          hasOverlap = true;
+        }
+        if (clearance < nearestClearance) {
+          nearestClearance = clearance;
+        }
+      }
+
+      if (!hasOverlap) {
+        return { x, y };
+      }
+
+      if (nearestClearance > bestClearance) {
+        bestClearance = nearestClearance;
+        bestX = x;
+        bestY = y;
+      }
     }
   }
 
+  // If very crowded, keep best local position near the cluster.
   return { x: bestX, y: bestY };
+}
+
+function resolveTargetOverlaps(flowers, bounds) {
+  // Final pass: separate any remaining collisions but keep flowers near their cluster center.
+  const iterations = 80;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    let moved = false;
+
+    for (let i = 0; i < flowers.length; i++) {
+      for (let j = i + 1; j < flowers.length; j++) {
+        const a = flowers[i];
+        const b = flowers[j];
+        const required = (a.size + b.size) * 0.6;
+        const dx = b.tx - a.tx;
+        const dy = b.ty - a.ty;
+        let d = Math.sqrt(dx * dx + dy * dy);
+
+        if (d < 0.0001) {
+          d = 0.0001;
+        }
+
+        if (d < required) {
+          const push = (required - d) * 0.52;
+          const nx = dx / d;
+          const ny = dy / d;
+
+          a.tx -= nx * push;
+          a.ty -= ny * push;
+          b.tx += nx * push;
+          b.ty += ny * push;
+          moved = true;
+        }
+      }
+    }
+
+    // Gentle pull back to each variable cluster center.
+    for (const f of flowers) {
+      f.tx += (f.ax - f.tx) * 0.05;
+      f.ty += (f.ay - f.ty) * 0.05;
+      f.tx = constrain(f.tx, bounds.minX + f.size * 0.5, bounds.maxX - f.size * 0.5);
+      f.ty = constrain(f.ty, bounds.minY + f.size * 0.5, bounds.maxY - f.size * 0.5);
+    }
+
+    if (!moved) {
+      break;
+    }
+  }
 }
 
 function updateAndDrawFlowers() {
@@ -408,7 +437,7 @@ function drawLegendRow(configItem, baseX, row, rowHeight, latest) {
   // Show real flower count currently rendered in the garden.
   fill("#9ea4b4");
   textSize(12);
-  text("Flowers: " + flowerCount, baseX + 34, y + 10);
+  text(String(flowerCount), baseX + 34, y + 10);
 }
 
 function drawFooter() {
