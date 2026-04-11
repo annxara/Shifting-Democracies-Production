@@ -35,11 +35,11 @@ const indicatorConfig = [
 // spreadMin / spreadMax: controls how wide branches open.
 const TREE_SETTINGS = {
   trunkMin: 100,
-  trunkMax: 155,
-  depthMin: 4,
-  depthMax: 6,
-  spreadMin: 14,
-  spreadMax: 24,
+  trunkMax: 110,
+  depthMin: 15,
+  depthMax: 20,
+  spreadMin: 10,
+  spreadMax: 15,
 };
 
 function preload() {
