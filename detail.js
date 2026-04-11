@@ -59,7 +59,8 @@ function toCountryArray(rawData) {
 
 function setup() {
   // Make the drawing area and center the images.
-  createCanvas(980, 760);
+  // A3 portrait-like ratio (about 1:1.414).
+  createCanvas(900, 1273);
   imageMode(CENTER);
   angleMode(DEGREES);
 
@@ -137,23 +138,20 @@ function buildMemoryField(latest) {
   // Create flowers that start near the center and settle into a garden.
 
   const flowers = [];
+  const totalFlowerCount = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
+  const flowerSize = getFlowerVisualSize(totalFlowerCount);
 
   const centerX = width / 2;
-  const centerY = height / 2 + 40;
+  const centerY = height / 2 + 20;
   const bounds = {
-    minX: 90,
-    maxX: width - 90,
-    minY: 130,
-    maxY: height - 160,
+    minX: 70,
+    maxX: width - 70,
+    minY: 150,
+    maxY: height - 290,
   };
 
-  // Separated anchor points so color clusters are not in one line.
-  const anchors = [
-    { x: width * 0.24, y: height * 0.32 }, // blue area
-    { x: width * 0.76, y: height * 0.34 }, // pink area
-    { x: width * 0.32, y: height * 0.7 },  // green area
-    { x: width * 0.7, y: height * 0.68 },  // yellow area
-  ];
+  // Build evenly spaced anchors for all indicators inside the flower area.
+  const anchors = buildGridAnchors(indicatorConfig.length, bounds);
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
@@ -162,8 +160,8 @@ function buildMemoryField(latest) {
 
     // One flower per rounded score point (0..10), same mapping as before.
     for (let n = 0; n < count; n++) {
-      const size = 75;
-      const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, 145);
+      const size = flowerSize;
+      const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, 130);
 
       flowers.push({
         x: centerX + random(-20, 20),
@@ -182,6 +180,30 @@ function buildMemoryField(latest) {
   return flowers;
 }
 
+function getFlowerVisualSize(totalFlowerCount) {
+  // More flowers => smaller size, so everything fits in portrait layout.
+  return constrain(map(totalFlowerCount, 20, 80, 64, 42), 40, 66);
+}
+
+function buildGridAnchors(anchorCount, bounds) {
+  const columns = 2;
+  const rows = Math.ceil(anchorCount / columns);
+  const anchors = [];
+  const horizontalStep = (bounds.maxX - bounds.minX) / (columns + 1);
+  const verticalStep = (bounds.maxY - bounds.minY) / (rows + 1);
+
+  for (let i = 0; i < anchorCount; i++) {
+    const column = i % columns;
+    const row = Math.floor(i / columns);
+    anchors.push({
+      x: bounds.minX + horizontalStep * (column + 1),
+      y: bounds.minY + verticalStep * (row + 1),
+    });
+  }
+
+  return anchors;
+}
+
 function pickGardenPositionNearAnchor(existingFlowers, size, bounds, anchor, clusterRadius) {
   // Pick near a color anchor first, with overlap protection.
   const margin = size * 0.48;
@@ -198,7 +220,7 @@ function pickGardenPositionNearAnchor(existingFlowers, size, bounds, anchor, clu
     const y = constrain(anchor.y + sin(a) * r, minY, maxY);
 
     const overlaps = existingFlowers.some((f) => {
-      const required = (size + f.size) * 0.42;
+      const required = (size + f.size) * 0.56;
       return dist(x, y, f.tx, f.ty) < required;
     });
 
@@ -225,7 +247,7 @@ function pickGardenPosition(existingFlowers, size, bounds) {
     const y = random(minY, maxY);
 
     const overlaps = existingFlowers.some((f) => {
-      const required = (size + f.size) * 0.42;
+      const required = (size + f.size) * 0.56;
       return dist(x, y, f.tx, f.ty) < required;
     });
 
@@ -235,10 +257,28 @@ function pickGardenPosition(existingFlowers, size, bounds) {
   }
 
   // Fallback if space is crowded.
-  return {
-    x: random(minX, maxX),
-    y: random(minY, maxY),
-  };
+  let bestX = random(minX, maxX);
+  let bestY = random(minY, maxY);
+  let bestClearance = -Infinity;
+
+  for (let i = 0; i < 120; i++) {
+    const x = random(minX, maxX);
+    const y = random(minY, maxY);
+
+    let nearest = Infinity;
+    for (const f of existingFlowers) {
+      const d = dist(x, y, f.tx, f.ty) - (size + f.size) * 0.56;
+      if (d < nearest) nearest = d;
+    }
+
+    if (nearest > bestClearance) {
+      bestClearance = nearest;
+      bestX = x;
+      bestY = y;
+    }
+  }
+
+  return { x: bestX, y: bestY };
 }
 
 function updateAndDrawFlowers() {
@@ -306,30 +346,36 @@ function getFlowerCount(latest, indicatorKey) {
 
 function drawLegend() {
   // Show which flower color belongs to which variable.
-  const legendY = height - 110;
-  const totalWidth = 860;
-  const startX = (width - totalWidth) / 2;
-  const spacing = totalWidth / indicatorConfig.length;
+  const legendTop = height - 235;
+  const columns = 2;
+  const rows = Math.ceil(indicatorConfig.length / columns);
+  const contentWidth = width - 120;
+  const columnWidth = contentWidth / columns;
+  const rowHeight = 48;
+  const startX = 60;
 
   textAlign(LEFT, CENTER);
   noStroke();
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
-    const x = startX + i * spacing;
+    const col = i % columns;
+    const row = Math.floor(i / columns);
+    const x = startX + col * columnWidth;
+    const y = legendTop + row * rowHeight;
 
     // Draw one example flower.
-    image(flowerImages[i], x, legendY);
+    image(flowerImages[i], x + 12, y, 30, 30);
 
     // Show the full name.
     fill("#e8eaf0");
-    textSize(15);
-    text(conf.label, x + 30, legendY - 10);
+    textSize(13);
+    text(conf.label, x + 34, y - 9);
 
     // Show the short variable name.
     fill("#a8adbb");
-    textSize(13);
-    text(conf.key, x + 30, legendY + 12);
+    textSize(12);
+    text(conf.key, x + 34, y + 10);
   }
 }
 
