@@ -131,33 +131,38 @@ function drawTree(latest) {
   updateAndDrawFlowers();
 }
 function buildMemoryField(latest) {
-  // Create a soft cluster of flowers starting near the center.
-  // Each flower will later drift depending on its data type.
+  // Create flowers that start near the center and settle into a garden.
 
   const flowers = [];
 
   const centerX = width / 2;
   const centerY = height / 2 + 40;
+  const bounds = {
+    minX: 90,
+    maxX: width - 90,
+    minY: 130,
+    maxY: height - 160,
+  };
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
     const count = getFlowerCount(latest, conf.key);
 
-    // Use more flowers than before to create density and layering.
+    // Use more flowers for a rich field look.
     for (let n = 0; n < count * 3; n++) {
+      const size = random(28, 72);
+      const target = pickGardenPosition(flowers, size, bounds);
+
       flowers.push({
         x: centerX + random(-20, 20),
         y: centerY + random(-20, 20),
-
-        vx: 0,
-        vy: 0,
+        tx: target.x,
+        ty: target.y,
 
         flowerIndex: i,
-        size: random(28, 72),
+        size,
         rotation: random(-1, 1),
-
-        life: random(200, 600),
-        age: 0,
+        settled: false,
       });
     }
   }
@@ -165,95 +170,84 @@ function buildMemoryField(latest) {
   return flowers;
 }
 
+function pickGardenPosition(existingFlowers, size, bounds) {
+  // Pick a random garden position that does not overlap existing targets.
+  const margin = size * 0.48;
+  const minX = bounds.minX + margin;
+  const maxX = bounds.maxX - margin;
+  const minY = bounds.minY + margin;
+  const maxY = bounds.maxY - margin;
+  const maxAttempts = 300;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const x = random(minX, maxX);
+    const y = random(minY, maxY);
+
+    const overlaps = existingFlowers.some((f) => {
+      const required = (size + f.size) * 0.42;
+      return dist(x, y, f.tx, f.ty) < required;
+    });
+
+    if (!overlaps) {
+      return { x, y };
+    }
+  }
+
+  // Fallback if space is crowded.
+  return {
+    x: random(minX, maxX),
+    y: random(minY, maxY),
+  };
+}
+
 function updateAndDrawFlowers() {
-  // Update position and draw each flower.
-  // Movement is driven by noise + directional bias.
+  // Move flowers toward their target and stop there.
 
   // Draw smaller flowers first so bigger ones sit visually on top.
   flowerCloud.sort((a, b) => a.size - b.size);
 
   for (let f of flowerCloud) {
-    f.age++;
+    if (!f.settled) {
+      const dx = f.tx - f.x;
+      const dy = f.ty - f.y;
 
-    // Each data type has a subtle directional pull.
-    const bias = [
-      { x: -0.15, y: 0 },   // blue → left
-      { x: 0.15, y: 0 },    // pink → right
-      { x: 0, y: -0.15 },   // green → up
-      { x: 0, y: 0.15 },    // yellow → down
-    ][f.flowerIndex];
+      f.x += dx * 0.08;
+      f.y += dy * 0.08;
 
-    // Organic drifting using Perlin noise.
-    const n = noise(f.x * 0.003, f.y * 0.003, frameCount * 0.003);
-
-    f.vx += (n - 0.5) * 0.4;
-    f.vy += (n - 0.5) * 0.4;
-
-    // Apply the data-driven direction.
-    f.vx += bias.x;
-    f.vy += bias.y;
-
-    // Soft damping keeps movement smooth and floaty.
-    f.vx *= 0.96;
-    f.vy *= 0.96;
-
-    f.x += f.vx;
-    f.y += f.vy;
-
-    // Slight upward drift for a "memory / evaporation" feeling.
-    f.y -= 0.05;
+      if (Math.abs(dx) < 0.6 && Math.abs(dy) < 0.6) {
+        f.x = f.tx;
+        f.y = f.ty;
+        f.settled = true;
+      }
+    }
 
     drawSingleFlower(f);
   }
 }
 
 function drawSingleFlower(f) {
-  // Draw one flower with soft motion and fading over time.
+  // Draw one flower.
 
   push();
 
   translate(f.x, f.y);
 
-  // Small rotation movement so flowers feel alive.
-  rotate(f.rotation + sin(f.age * 0.02) * 0.2);
+  rotate(f.rotation);
 
-  // Fade out slowly over lifetime.
-  const alpha = map(f.age, 0, f.life, 220, 40);
-
-  tint(255, alpha);
-
-  // Subtle pulsing size.
-  const pulse = 1 + sin(f.age * 0.05) * 0.08;
+  noTint();
 
   image(
     flowerImages[f.flowerIndex],
     0,
     0,
-    f.size * pulse,
-    f.size * pulse
+    f.size,
+    f.size
   );
 
   pop();
 }
 
-function drawFieldBackground() {
-  // Dark background with soft glow and grain texture.
 
-  background("#0e0e12");
-
-  // Soft light bloom in the center.
-  noStroke();
-  for (let i = 0; i < 80; i++) {
-    fill(255, 6);
-    ellipse(width / 2, height / 2 + 40, 200 + i * 10);
-  }
-
-  // Light grain texture to avoid flat digital look.
-  for (let i = 0; i < 1200; i++) {
-    stroke(255, 8);
-    point(random(width), random(height));
-  }
-}
 
 /*function drawRecursiveTree(counts) {
   // Draw one white tree. More flowers = bigger tree and more branch levels.
