@@ -37,8 +37,8 @@ const indicatorConfig = [
 const TREE_SETTINGS = {
   trunkMin: 95,
   trunkMax: 125,
-  depthMin: 4,
-  depthMax: 5,
+  depthMin:7,
+  depthMax: 10,
   spreadMin: 14,
   spreadMax: 21,
   maxTips: 30,
