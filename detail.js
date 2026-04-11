@@ -148,6 +148,9 @@ function drawTree(latest) {
 function drawRecursiveTree(counts) {
   // Draw one white tree. More flowers = bigger tree and more branches.
   const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
+  const leftFlowers = counts[0] + counts[2];
+  const rightFlowers = counts[1] + counts[3];
+  const sideBalance = constrain((leftFlowers - rightFlowers) / 20, -1, 1);
 
   // 1) Main size of the tree.
   const trunkLength = map(totalFlowers, 0, 40, TREE_SETTINGS.trunkMin, TREE_SETTINGS.trunkMax);
@@ -164,13 +167,15 @@ function drawRecursiveTree(counts) {
 
   push();
   translate(width / 2, height - 120);
+  // Small lean so the trunk does not feel perfectly centered/cone-like.
+  rotate(sideBalance * 2.2);
   stroke(255);
   noFill();
-  drawBranch(trunkLength, branchDepth, branchSpread, counts);
+  drawBranch(trunkLength, branchDepth, branchSpread, counts, sideBalance);
   pop();
 }
 
-function drawBranch(len, depth, spread, counts) {
+function drawBranch(len, depth, spread, counts, sideBalance) {
   // len: current branch size (smaller each level)
   // depth: how many split levels are left (higher = more branches)
   // spread: left/right branch angle
@@ -198,31 +203,25 @@ function drawBranch(len, depth, spread, counts) {
   const rightAngle = map(rightFlowers, 0, 20, spread - 5, spread + 7);
 
   // Child branch length controls how dense/full the tree looks.
-  const leftLen = len * map(leftFlowers, 0, 20, 0.64, 0.81);
-  const rightLen = len * map(rightFlowers, 0, 20, 0.64, 0.81);
+  const leftLen = len * map(leftFlowers, 0, 20, 0.67, 0.82);
+  const rightLen = len * map(rightFlowers, 0, 20, 0.67, 0.82);
 
   // Angle gets a little smaller at each level for natural tapering.
   const nextSpread = spread * 0.9;
 
-  // Split into 4 children: far-left, left, right, far-right.
+  // Give deeper levels a gentle alternating bend to avoid a strict cone shape.
+  const wobble = (depth % 2 === 0 ? 1 : -1) * 3.2;
+  const leftTurn = leftAngle + wobble + sideBalance * 2;
+  const rightTurn = rightAngle - wobble - sideBalance * 2;
+
   push();
-  rotate(leftAngle + nextSpread * 0.45);
-  drawBranch(leftLen * 0.9, depth - 1, nextSpread, counts);
+  rotate(leftTurn);
+  drawBranch(leftLen, depth - 1, nextSpread, counts, sideBalance);
   pop();
 
   push();
-  rotate(leftAngle * 0.55);
-  drawBranch(leftLen, depth - 1, nextSpread, counts);
-  pop();
-
-  push();
-  rotate(-rightAngle * 0.55);
-  drawBranch(rightLen, depth - 1, nextSpread, counts);
-  pop();
-
-  push();
-  rotate(-(rightAngle + nextSpread * 0.45));
-  drawBranch(rightLen * 0.9, depth - 1, nextSpread, counts);
+  rotate(-rightTurn);
+  drawBranch(rightLen, depth - 1, nextSpread, counts, sideBalance);
   pop();
 }
 
