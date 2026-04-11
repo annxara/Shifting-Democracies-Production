@@ -127,7 +127,6 @@ function drawTree(latest) {
     flowerCloud = buildMemoryField(latest);
   }
 
-  drawFieldBackground();
   updateAndDrawFlowers();
 }
 function buildMemoryField(latest) {
