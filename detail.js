@@ -143,14 +143,23 @@ function buildMemoryField(latest) {
     maxY: height - 160,
   };
 
+  // Separated anchor points so color clusters are not in one line.
+  const anchors = [
+    { x: width * 0.24, y: height * 0.32 }, // blue area
+    { x: width * 0.76, y: height * 0.34 }, // pink area
+    { x: width * 0.32, y: height * 0.7 },  // green area
+    { x: width * 0.7, y: height * 0.68 },  // yellow area
+  ];
+
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
     const count = getFlowerCount(latest, conf.key);
+    const anchor = anchors[i % anchors.length];
 
     // One flower per rounded score point (0..10), same mapping as before.
     for (let n = 0; n < count; n++) {
       const size = random(28, 72);
-      const target = pickGardenPosition(flowers, size, bounds);
+      const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, 145);
 
       flowers.push({
         x: centerX + random(-20, 20),
@@ -167,6 +176,35 @@ function buildMemoryField(latest) {
   }
 
   return flowers;
+}
+
+function pickGardenPositionNearAnchor(existingFlowers, size, bounds, anchor, clusterRadius) {
+  // Pick near a color anchor first, with overlap protection.
+  const margin = size * 0.48;
+  const minX = bounds.minX + margin;
+  const maxX = bounds.maxX - margin;
+  const minY = bounds.minY + margin;
+  const maxY = bounds.maxY - margin;
+  const maxAttempts = 340;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const a = random(TWO_PI);
+    const r = clusterRadius * sqrt(random());
+    const x = constrain(anchor.x + cos(a) * r, minX, maxX);
+    const y = constrain(anchor.y + sin(a) * r, minY, maxY);
+
+    const overlaps = existingFlowers.some((f) => {
+      const required = (size + f.size) * 0.42;
+      return dist(x, y, f.tx, f.ty) < required;
+    });
+
+    if (!overlaps) {
+      return { x, y };
+    }
+  }
+
+  // If local area is crowded, use global fallback.
+  return pickGardenPosition(existingFlowers, size, bounds);
 }
 
 function pickGardenPosition(existingFlowers, size, bounds) {
