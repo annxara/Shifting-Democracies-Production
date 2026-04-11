@@ -13,7 +13,6 @@ let countryIndex = 0;
 let flowerImages = [];
 let flowerCloud = [];
 let flowerCloudKey = "";
-let branchTips = [];
 
 // These values come from the control page.
 const params = {
@@ -30,23 +29,7 @@ const indicatorConfig = [
   { key: "v2x_delibdem", label: "Deliberative Democracy", image: "pictures/forgetmenot_yellow.png" },
 ];
 
-// TREE SETTINGS (easy to tweak)
-// trunkMin / trunkMax: make the whole tree shorter or taller.
-// depthMin / depthMax: controls how many branch levels are drawn.
-// spreadMin / spreadMax: controls how wide branches open.
-const TREE_SETTINGS = {
-  trunkMin: 95,
-  trunkMax: 125,
-  depthMin: 6,
-  depthMax: 10,
-  spreadMin: 7,
-  spreadMax: 10,
-  spreadGrowth: 1.15,
-  spreadCap: 30,
-  childScale: 0.75,
-  maxTips: 80,
-  altTurnBoost: 2,
-};
+
 
 function preload() {
   // Load the data file and the flower pictures first.
@@ -137,26 +120,142 @@ function drawHeader(country, latest) {
 }
 
 function drawTree(latest) {
-  // Draw the tree first, then draw the flowers.
-  const counts = indicatorConfig.map((conf) => getFlowerCount(latest, conf.key));
-  branchTips = drawRecursiveTree(counts);
+  // Instead of a strict tree, we now draw a drifting flower field.
+  // The flowers behave like a soft cloud that moves over time.
 
-  // Build flowers once per country/year, using branch tips only.
   if (flowerCloud.length === 0) {
-    buildFlowerCloud(latest, branchTips);
+    flowerCloud = buildMemoryField(latest);
   }
 
-  for (let i = 0; i < flowerCloud.length; i++) {
-    const flower = flowerCloud[i];
-    push();
-    translate(flower.x, flower.y);
-    rotate(flower.rotation);
-    image(flowerImages[flower.flowerIndex], 0, 0, flower.size, flower.size);
-    pop();
+  drawFieldBackground();
+  updateAndDrawFlowers();
+}
+function buildMemoryField(latest) {
+  // Create a soft cluster of flowers starting near the center.
+  // Each flower will later drift depending on its data type.
+
+  const flowers = [];
+
+  const centerX = width / 2;
+  const centerY = height / 2 + 40;
+
+  for (let i = 0; i < indicatorConfig.length; i++) {
+    const conf = indicatorConfig[i];
+    const count = getFlowerCount(latest, conf.key);
+
+    // Use more flowers than before to create density and layering.
+    for (let n = 0; n < count * 3; n++) {
+      flowers.push({
+        x: centerX + random(-20, 20),
+        y: centerY + random(-20, 20),
+
+        vx: 0,
+        vy: 0,
+
+        flowerIndex: i,
+        size: random(28, 72),
+        rotation: random(-1, 1),
+
+        life: random(200, 600),
+        age: 0,
+      });
+    }
+  }
+
+  return flowers;
+}
+
+function updateAndDrawFlowers() {
+  // Update position and draw each flower.
+  // Movement is driven by noise + directional bias.
+
+  // Draw smaller flowers first so bigger ones sit visually on top.
+  flowerCloud.sort((a, b) => a.size - b.size);
+
+  for (let f of flowerCloud) {
+    f.age++;
+
+    // Each data type has a subtle directional pull.
+    const bias = [
+      { x: -0.15, y: 0 },   // blue → left
+      { x: 0.15, y: 0 },    // pink → right
+      { x: 0, y: -0.15 },   // green → up
+      { x: 0, y: 0.15 },    // yellow → down
+    ][f.flowerIndex];
+
+    // Organic drifting using Perlin noise.
+    const n = noise(f.x * 0.003, f.y * 0.003, frameCount * 0.003);
+
+    f.vx += (n - 0.5) * 0.4;
+    f.vy += (n - 0.5) * 0.4;
+
+    // Apply the data-driven direction.
+    f.vx += bias.x;
+    f.vy += bias.y;
+
+    // Soft damping keeps movement smooth and floaty.
+    f.vx *= 0.96;
+    f.vy *= 0.96;
+
+    f.x += f.vx;
+    f.y += f.vy;
+
+    // Slight upward drift for a "memory / evaporation" feeling.
+    f.y -= 0.05;
+
+    drawSingleFlower(f);
   }
 }
 
-function drawRecursiveTree(counts) {
+function drawSingleFlower(f) {
+  // Draw one flower with soft motion and fading over time.
+
+  push();
+
+  translate(f.x, f.y);
+
+  // Small rotation movement so flowers feel alive.
+  rotate(f.rotation + sin(f.age * 0.02) * 0.2);
+
+  // Fade out slowly over lifetime.
+  const alpha = map(f.age, 0, f.life, 220, 40);
+
+  tint(255, alpha);
+
+  // Subtle pulsing size.
+  const pulse = 1 + sin(f.age * 0.05) * 0.08;
+
+  image(
+    flowerImages[f.flowerIndex],
+    0,
+    0,
+    f.size * pulse,
+    f.size * pulse
+  );
+
+  pop();
+}
+
+function drawFieldBackground() {
+  // Dark background with soft glow and grain texture.
+
+  background("#0e0e12");
+
+  // Soft light bloom in the center.
+  noStroke();
+  for (let i = 0; i < 80; i++) {
+    fill(255, 6);
+    ellipse(width / 2, height / 2 + 40, 200 + i * 10);
+  }
+
+  // Light grain texture to avoid flat digital look.
+  for (let i = 0; i < 1200; i++) {
+    stroke(255, 8);
+    point(random(width), random(height));
+  }
+}
+
+/*function drawRecursiveTree(counts) {
   // Draw one white tree. More flowers = bigger tree and more branch levels.
   const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
   const desiredTips = Math.max(40, totalFlowers);
@@ -224,14 +323,16 @@ function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level,
   // Spacing rule: each deeper layer has wider spacing than the previous one.
   const nextSpread = Math.min(spread * TREE_SETTINGS.spreadGrowth, TREE_SETTINGS.spreadCap);
 
-  // Alternate the turn amounts each level so the split is less cone-like.
+  // Alternate tiny turn offsets to avoid perfectly mirrored branching.
   const alt = level % 2 === 0 ? TREE_SETTINGS.altTurnBoost : -TREE_SETTINGS.altTurnBoost;
   const leftTurn = constrain(leftAngle + alt + sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
   const rightTurn = constrain(rightAngle - alt - sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
 
+
   drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
   drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
 }
+*/
 
 function getFlowerCount(latest, indicatorKey) {
   // Turn a value from 0 to 1 into a flower count from 0 to 10.
@@ -240,7 +341,7 @@ function getFlowerCount(latest, indicatorKey) {
   return Math.round(score01 * 10);
 }
 
-function buildFlowerCloud(latest, tips) {
+/*function buildFlowerCloud(latest, tips) {
   // Place flowers only at branch ends.
   flowerCloud = [];
 
@@ -276,7 +377,7 @@ function buildFlowerCloud(latest, tips) {
     }
   }
 }
-
+*/
 function drawLegend() {
   // Show which flower color belongs to which variable.
   const legendY = height - 110;
