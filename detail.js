@@ -437,7 +437,7 @@ function drawLegend(latest) {
 
   const panelX = 24;
   const panelY = height - LEGEND_BLOCK_HEIGHT;
-  const panelW = width - 48;
+  const panelW = width + 48;
   const panelH = LEGEND_BLOCK_HEIGHT;
   const startX = panelX + 18;
   const contentWidth = panelW - 36;
