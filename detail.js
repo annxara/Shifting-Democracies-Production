@@ -39,10 +39,10 @@ const TREE_SETTINGS = {
   trunkMax: 125,
   depthMin: 6,
   depthMax: 10,
-  spreadMin: 14,
-  spreadMax: 21,
+  spreadMin: 11,
+  spreadMax: 18,
   maxTips: 80,
-  altTurnBoost: 7,
+  altTurnBoost: 2,
 };
 
 function preload() {
@@ -174,7 +174,7 @@ function drawRecursiveTree(counts) {
   const tips = [];
   const startX = width / 2;
   const startY = height - 120;
-  const startAngle = -90 + sideBalance * 2.2;
+  const startAngle = -90 + sideBalance * 0.8;
 
   stroke(255);
   noFill();
@@ -211,20 +211,20 @@ function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level,
   const rightFlowers = counts[1] + counts[3];
 
   // More flowers on a side -> that side opens a bit wider.
-  const leftAngle = map(leftFlowers, 0, 20, spread * 0.8, spread * 1.28);
-  const rightAngle = map(rightFlowers, 0, 20, spread * 0.8, spread * 1.28);
+  const leftAngle = map(leftFlowers, 0, 20, spread * 0.9, spread * 1.08);
+  const rightAngle = map(rightFlowers, 0, 20, spread * 0.9, spread * 1.08);
 
   // Child branch length controls how dense/full the tree looks.
   const leftLen = len * map(leftFlowers, 0, 20, 0.67, 0.82);
   const rightLen = len * map(rightFlowers, 0, 20, 0.67, 0.82);
 
   // Angle gets a little smaller at each level for natural tapering.
-  const nextSpread = spread * 0.9;
+  const nextSpread = spread * 0.94;
 
   // Alternate the turn amounts each level so the split is less cone-like.
   const alt = level % 2 === 0 ? TREE_SETTINGS.altTurnBoost : -TREE_SETTINGS.altTurnBoost;
-  const leftTurn = constrain(leftAngle + alt + sideBalance * 2, 8, 58);
-  const rightTurn = constrain(rightAngle - alt - sideBalance * 2, 8, 58);
+  const leftTurn = constrain(leftAngle + alt + sideBalance * 0.8, 8, 28);
+  const rightTurn = constrain(rightAngle - alt - sideBalance * 0.8, 8, 28);
 
   drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
   drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
