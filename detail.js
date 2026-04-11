@@ -15,6 +15,13 @@ let flowerCloud = [];
 let flowerCloudKey = "";
 const ROTATE_CANVAS_90 = true;
 
+function getCanvasSize() {
+  // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
+  return ROTATE_CANVAS_90
+    ? { width: windowHeight, height: windowWidth }
+    : { width: windowWidth, height: windowHeight };
+}
+
 // These values come from the control page.
 const params = {
   stfeco: 5,
@@ -60,8 +67,8 @@ function toCountryArray(rawData) {
 
 function setup() {
   // Make the drawing area and center the images.
-  // A3 portrait-like ratio (about 1:1.414).
-  const canvas = createCanvas(900, 1273);
+  const canvasSize = getCanvasSize();
+  const canvas = createCanvas(canvasSize.width, canvasSize.height);
   if (ROTATE_CANVAS_90) {
     canvas.elt.style.transform = "rotate(90deg)";
     canvas.elt.style.transformOrigin = "center center";
@@ -80,6 +87,13 @@ function setup() {
   // Draw the first view and connect to the socket.
   applyFilterAndResetIndex();
   connectSocket();
+}
+
+function windowResized() {
+  const canvasSize = getCanvasSize();
+  resizeCanvas(canvasSize.width, canvasSize.height);
+  flowerCloud = [];
+  flowerCloudKey = "";
 }
 
 function draw() {
