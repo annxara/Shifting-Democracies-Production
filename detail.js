@@ -39,8 +39,11 @@ const TREE_SETTINGS = {
   trunkMax: 125,
   depthMin: 6,
   depthMax: 10,
-  spreadMin: 11,
-  spreadMax: 18,
+  spreadMin: 7,
+  spreadMax: 10,
+  spreadGrowth: 1.15,
+  spreadCap: 30,
+  childScale: 0.75,
   maxTips: 80,
   altTurnBoost: 2,
 };
@@ -168,7 +171,7 @@ function drawRecursiveTree(counts) {
   const requiredDepth = Math.ceil(Math.log2(desiredTips)) + 1;
   const branchDepth = constrain(requiredDepth, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax);
 
-  // 3) How much branches spread left/right.
+  // 3) First split spacing (small at trunk, then grows by layer).
   const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
 
   const tips = [];
@@ -214,17 +217,17 @@ function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level,
   const leftAngle = map(leftFlowers, 0, 20, spread * 0.9, spread * 1.08);
   const rightAngle = map(rightFlowers, 0, 20, spread * 0.9, spread * 1.08);
 
-  // Child branch length controls how dense/full the tree looks.
-  const leftLen = len * map(leftFlowers, 0, 20, 0.67, 0.82);
-  const rightLen = len * map(rightFlowers, 0, 20, 0.67, 0.82);
+  // Branch size rule: every next layer is about 3/4 of the previous one.
+  const leftLen = len * TREE_SETTINGS.childScale;
+  const rightLen = len * TREE_SETTINGS.childScale;
 
-  // Angle gets a little smaller at each level for natural tapering.
-  const nextSpread = spread * 0.94;
+  // Spacing rule: each deeper layer has wider spacing than the previous one.
+  const nextSpread = Math.min(spread * TREE_SETTINGS.spreadGrowth, TREE_SETTINGS.spreadCap);
 
   // Alternate the turn amounts each level so the split is less cone-like.
   const alt = level % 2 === 0 ? TREE_SETTINGS.altTurnBoost : -TREE_SETTINGS.altTurnBoost;
-  const leftTurn = constrain(leftAngle + alt + sideBalance * 0.8, 8, 28);
-  const rightTurn = constrain(rightAngle - alt - sideBalance * 0.8, 8, 28);
+  const leftTurn = constrain(leftAngle + alt + sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
+  const rightTurn = constrain(rightAngle - alt - sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
 
   drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
   drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
