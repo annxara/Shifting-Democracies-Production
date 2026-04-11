@@ -13,6 +13,7 @@ let countryIndex = 0;
 let flowerImages = [];
 let flowerCloud = [];
 let flowerCloudKey = "";
+let clusterAnimationStartsAt = 0;
 const ROTATE_CANVAS_90 = true;
 
 function getCanvasSize() {
@@ -149,6 +150,7 @@ function drawTree(latest) {
 
   if (flowerCloud.length === 0) {
     flowerCloud = buildMemoryField(latest);
+    clusterAnimationStartsAt = millis() + 2000;
   }
 
   updateAndDrawFlowers();
@@ -334,13 +336,14 @@ function resolveTargetOverlaps(flowers, bounds) {
 }
 
 function updateAndDrawFlowers() {
-  // Move flowers toward their target and stop there.
+  // Show random start positions first, then move toward clusters.
+  const shouldStartClustering = millis() >= clusterAnimationStartsAt;
 
   // Draw smaller flowers first so bigger ones sit visually on top.
   flowerCloud.sort((a, b) => a.size - b.size);
 
   for (let f of flowerCloud) {
-    if (!f.settled) {
+    if (shouldStartClustering && !f.settled) {
       const dx = f.tx - f.x;
       const dy = f.ty - f.y;
 
