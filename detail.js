@@ -143,11 +143,17 @@ function buildMemoryField(latest) {
     maxY: height - 160,
   };
 
-  // One cluster center per color so same-color flowers stay together.
-  const clusterCenters = [];
-  for (let i = 0; i < indicatorConfig.length; i++) {
-    clusterCenters.push(pickGardenPosition(flowers, 80, bounds));
-  }
+  // One broad anchor per color to keep colors grouped but still abstract.
+  const baseAnchors = [
+    { x: width * 0.33, y: height * 0.5 },
+    { x: width * 0.67, y: height * 0.5 },
+    { x: width * 0.46, y: height * 0.3 },
+    { x: width * 0.54, y: height * 0.66 },
+  ];
+  const clusterCenters = baseAnchors.map((a) => ({
+    x: constrain(a.x + random(-40, 40), bounds.minX, bounds.maxX),
+    y: constrain(a.y + random(-40, 40), bounds.minY, bounds.maxY),
+  }));
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
@@ -156,8 +162,8 @@ function buildMemoryField(latest) {
 
     // One flower per rounded score point (0..10), same mapping as before.
     for (let n = 0; n < count; n++) {
-      const size = 20;
-      const target = pickGardenPositionNearCluster(flowers, size, bounds, cluster.x, cluster.y, 95);
+      const size = random(36, 78);
+      const target = pickGardenPositionNearCluster(flowers, size, bounds, cluster.x, cluster.y, 180);
 
       flowers.push({
         x: centerX + random(-20, 20),
@@ -177,32 +183,48 @@ function buildMemoryField(latest) {
 }
 
 function pickGardenPositionNearCluster(existingFlowers, size, bounds, cx, cy, radius) {
-  // Try placing near the given cluster center first.
+  // Place near the given color cluster; avoid sending flowers to unrelated areas.
   const margin = size * 0.48;
   const minX = bounds.minX + margin;
   const maxX = bounds.maxX - margin;
   const minY = bounds.minY + margin;
   const maxY = bounds.maxY - margin;
   const maxAttempts = 300;
+  let best = { x: constrain(cx, minX, maxX), y: constrain(cy, minY, maxY), minGap: -Infinity };
 
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const localRadius = radius + attempt * 0.22;
     const a = random(TWO_PI);
-    const r = radius * sqrt(random());
+    const r = localRadius * sqrt(random());
     const x = constrain(cx + cos(a) * r, minX, maxX);
     const y = constrain(cy + sin(a) * r, minY, maxY);
 
-    const overlaps = existingFlowers.some((f) => {
-      const required = (size + f.size) * 0.42;
-      return dist(x, y, f.tx, f.ty) < required;
-    });
+    let minGap = Infinity;
+    let overlaps = false;
+    for (let i = 0; i < existingFlowers.length; i++) {
+      const f = existingFlowers[i];
+      const required = (size + f.size) * 0.44;
+      const gap = dist(x, y, f.tx, f.ty) - required;
+      if (gap < minGap) {
+        minGap = gap;
+      }
+      if (gap < 0) {
+        overlaps = true;
+        break;
+      }
+    }
 
     if (!overlaps) {
       return { x, y };
     }
+
+    if (minGap > best.minGap) {
+      best = { x, y, minGap };
+    }
   }
 
-  // If local area is crowded, fall back to global non-overlap placement.
-  return pickGardenPosition(existingFlowers, size, bounds);
+  // If cluster is crowded, keep the best near-cluster candidate.
+  return { x: best.x, y: best.y };
 }
 
 function pickGardenPosition(existingFlowers, size, bounds) {
