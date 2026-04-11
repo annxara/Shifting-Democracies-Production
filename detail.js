@@ -1,12 +1,12 @@
-// Pick the right server address for local use or the live site.
+// Use the local server on your computer, or the live site online.
 const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 const SERVER_URL = isLocal ? "http://localhost:8080" : window.location.origin;
 
-// Socket connection and a small status flag for the page.
+// Socket connection and a flag that says if it is connected.
 let socket;
 let socketConnected = false;
 
-// Data and assets used by the page.
+// Data and pictures used by the page.
 let countryData = [];
 let filteredCountries = [];
 let countryIndex = 0;
@@ -21,7 +21,7 @@ const params = {
   stfgov: 5,
 };
 
-// Each color goes with one data variable.
+// Each color belongs to one data variable.
 const indicatorConfig = [
   { key: "v2x_libdem", label: "Liberal Democracy", image: "pictures/forgetmenot_blue.png" },
   { key: "v2x_polyarchy", label: "Polyarchy", image: "pictures/forgetmenot_pink.png" },
@@ -30,7 +30,7 @@ const indicatorConfig = [
 ];
 
 function preload() {
-  // Load the JSON data and the flower pictures first.
+  // Load the data file and the flower pictures first.
   countryData = loadJSON("ess_vdem_country_year_variables 2.json");
 
   for (let i = 0; i < indicatorConfig.length; i++) {
@@ -38,7 +38,7 @@ function preload() {
   }
 }
 
-// Turn the loaded data into a simple array if needed.
+// Make sure the data is in an array.
 function toCountryArray(rawData) {
   if (Array.isArray(rawData)) return rawData;
   if (rawData && Array.isArray(rawData.data)) return rawData.data;
@@ -52,40 +52,40 @@ function toCountryArray(rawData) {
 }
 
 function setup() {
-  // Make the canvas and tell p5 to center images.
+  // Make the drawing area and center the images.
   createCanvas(980, 760);
   imageMode(CENTER);
 
-  // Clean the data shape before using it.
+  // Make the data ready to use.
   countryData = toCountryArray(countryData);
 
-  // Make the flower images the same size.
+  // Make all flower pictures the same size.
   for (let i = 0; i < flowerImages.length; i++) {
     flowerImages[i].resize(42, 0);
   }
 
-  // Build the first view and connect to the socket.
+  // Draw the first view and connect to the socket.
   applyFilterAndResetIndex();
   connectSocket();
 }
 
 function draw() {
-  // Clear the screen every frame.
+  // Clear the screen each time it draws.
   background("#101015");
 
-  // Show a loading message until the data is ready.
+  // Show this while the data is loading.
   if (!countryData || countryData.length === 0) {
     drawLoadingState();
     return;
   }
 
-  // Show a message if nothing matches the current filters.
+  // Show this if nothing matches the current filters.
   if (filteredCountries.length === 0) {
     drawNoMatchState();
     return;
   }
 
-  // Pick the current country and its newest year.
+  // Pick the current country and newest year.
   const country = filteredCountries[countryIndex];
   const latest = getLatestYearEntry(country.years);
 
@@ -117,7 +117,7 @@ function drawHeader(country, latest) {
 }
 
 function drawTree(latest) {
-  // Draw the trunk and branches, then place the flowers.
+  // Draw the tree, then draw the flowers.
   const trunkBaseX = width / 2;
   const trunkTopY = 155;
   const trunkBaseY = height - 150;
@@ -203,7 +203,7 @@ function drawBranchPath(startX, startY, endX, endY, curl) {
 }
 
 function drawOrganicBranches(baseX, topY, canopyCenterX, canopyCenterY) {
-  // Draw several branches that go in different directions.
+  // Draw several branches that spread out.
   const branches = [
     { x: baseX - 10, y: topY + 190, ex: canopyCenterX - 150, ey: canopyCenterY + 90, curl: -28 },
     { x: baseX + 6, y: topY + 165, ex: canopyCenterX + 140, ey: canopyCenterY + 55, curl: 24 },
@@ -219,14 +219,14 @@ function drawOrganicBranches(baseX, topY, canopyCenterX, canopyCenterY) {
 }
 
 function getFlowerCount(latest, indicatorKey) {
-  // Turn the 0 to 1 value into a 0 to 10 flower count.
+  // Turn a value from 0 to 1 into a flower count from 0 to 10.
   const rawValue = Number(latest[indicatorKey]);
   const score01 = Number.isFinite(rawValue) ? constrain(rawValue, 0, 1) : 0;
   return Math.round(score01 * 10);
 }
 
 function buildFlowerCloud(latest) {
-  // Place flowers in the middle area without letting them touch.
+  // Put flowers in the middle without letting them touch.
   flowerCloud = [];
 
   const bounds = {
@@ -249,12 +249,12 @@ function buildFlowerCloud(latest) {
         const x = random(bounds.minX, bounds.maxX);
         const y = random(bounds.minY, bounds.maxY);
 
-        // Keep the center a little open so the tree is easier to read.
+        // Leave a little open space in the middle.
         if (x > width * 0.43 && x < width * 0.57 && y > height * 0.18 && y < height * 0.46) {
           continue;
         }
 
-        // Skip spots that are too close to another flower.
+        // Do not place a flower too close to another one.
         const overlaps = flowerCloud.some((flower) => dist(x, y, flower.x, flower.y) < minDistance);
         if (!overlaps) {
           flowerCloud.push({
@@ -294,15 +294,15 @@ function drawLegend() {
     const conf = indicatorConfig[i];
     const x = startX + i * spacing;
 
-    // Draw one sample flower.
+    // Draw one example flower.
     image(flowerImages[i], x, legendY);
 
-    // Show the long name.
+    // Show the full name.
     fill("#e8eaf0");
     textSize(15);
     text(conf.label, x + 30, legendY - 10);
 
-    // Show the variable key.
+    // Show the short variable name.
     fill("#a8adbb");
     textSize(13);
     text(conf.key, x + 30, legendY + 12);
@@ -372,7 +372,7 @@ function getLatestYearEntry(years) {
 }
 
 function findMatchingYear(country, activeParams) {
-  // Skip bad data.
+  // Skip broken data.
   if (!country || !country.years) return null;
 
   // Match only when all three numbers are the same.
@@ -411,7 +411,7 @@ function applyFilterAndResetIndex() {
 }
 
 function keyPressed() {
-  // Use arrow keys to move through the countries.
+  // Use the arrow keys to move through the countries.
   if (filteredCountries.length === 0) return;
 
   if (keyCode === RIGHT_ARROW) {
@@ -438,7 +438,7 @@ function connectSocket() {
   });
 
   socket.on("params", (incoming) => {
-    // Save the new values and refresh the view.
+    // Save the new values and redraw the page.
     Object.assign(params, {
       stfeco: Number(incoming.stfeco),
       stflife: Number(incoming.stflife),
