@@ -34,12 +34,12 @@ const indicatorConfig = [
 // depthMin / depthMax: controls how many branch levels are drawn.
 // spreadMin / spreadMax: controls how wide branches open.
 const TREE_SETTINGS = {
-  trunkMin: 100,
-  trunkMax: 110,
-  depthMin: 15,
-  depthMax: 20,
-  spreadMin: 10,
-  spreadMax: 15,
+  trunkMin: 95,
+  trunkMax: 125,
+  depthMin: 2,
+  depthMax: 3,
+  spreadMin: 11,
+  spreadMax: 16,
 };
 
 function preload() {
@@ -75,7 +75,7 @@ function setup() {
 
   // Make all flower pictures the same size.
   for (let i = 0; i < flowerImages.length; i++) {
-    flowerImages[i].resize(42, 0);
+    flowerImages[i].resize(54, 0);
   }
 
   // Draw the first view and connect to the socket.
@@ -180,7 +180,7 @@ function drawBranch(len, depth, spread, counts, sideBalance) {
   // depth: how many split levels are left (higher = more branches)
   // spread: left/right branch angle
   // counts: flower totals used to shape left vs right side
-  if (len < 6 || depth <= 0) {
+  if (len < 9 || depth <= 0) {
     return;
   }
 
@@ -239,15 +239,15 @@ function buildFlowerCloud(latest) {
   const totalFlowers = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
 
   const bounds = {
-    minX: width * 0.34,
-    maxX: width * 0.66,
-    minY: height * 0.2,
-    maxY: height * 0.58,
+    minX: width * 0.36,
+    maxX: width * 0.64,
+    minY: height * 0.22,
+    maxY: height * 0.56,
   };
 
   // More flowers -> allow slightly tighter spacing so canopy looks full.
-  const minDistance = map(totalFlowers, 0, 40, 30, 20);
-  const maxAttemptsPerFlower = 400;
+  const minDistance = map(totalFlowers, 0, 40, 34, 26);
+  const maxAttemptsPerFlower = 700;
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const count = getFlowerCount(latest, indicatorConfig[i].key);
