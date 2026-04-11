@@ -125,7 +125,7 @@ function draw() {
 
   drawHeader(country, latest);
   drawTree(latest);
-  drawLegend();
+  drawLegend(latest);
   drawFooter();
 }
 
@@ -363,39 +363,52 @@ function getFlowerCount(latest, indicatorKey) {
   return Math.round(constrain(rawValue, 0, 10));
 }
 
-function drawLegend() {
-  // Show which flower color belongs to which variable.
-  const legendTop = height - 235;
-  const columns = 2;
-  const rows = Math.ceil(indicatorConfig.length / columns);
-  const contentWidth = width - 120;
-  const columnWidth = contentWidth / columns;
-  const rowHeight = 48;
+function drawLegend(latest) {
+  // Show V-Dem indicators on the left and ESS indicators on the right.
+  const vDemIndicators = indicatorConfig.filter((item) => item.key.startsWith("v2x_"));
+  const essIndicators = indicatorConfig.filter((item) => item.key.startsWith("stf"));
+
+  const legendTop = height - 250;
   const startX = 60;
+  const contentWidth = width - 120;
+  const columnWidth = contentWidth / 2;
+  const rowHeight = 48;
 
   textAlign(LEFT, CENTER);
   noStroke();
 
-  for (let i = 0; i < indicatorConfig.length; i++) {
-    const conf = indicatorConfig[i];
-    const col = i % columns;
-    const row = Math.floor(i / columns);
-    const x = startX + col * columnWidth;
-    const y = legendTop + row * rowHeight;
+  fill("#f0f3fa");
+  textSize(15);
+  text("V-Dem Values", startX, legendTop - 26);
+  text("ESS Values", startX + columnWidth, legendTop - 26);
 
-    // Draw one example flower.
-    image(flowerImages[i], x + 12, y, 30, 30);
+  const rows = Math.max(vDemIndicators.length, essIndicators.length);
 
-    // Show the full name.
-    fill("#e8eaf0");
-    textSize(13);
-    text(conf.label, x + 34, y - 9);
-
-    // Show the short variable name.
-    fill("#a8adbb");
-    textSize(12);
-    text(conf.key, x + 34, y + 10);
+  for (let row = 0; row < rows; row++) {
+    drawLegendRow(vDemIndicators[row], startX, row, rowHeight, latest);
+    drawLegendRow(essIndicators[row], startX + columnWidth, row, rowHeight, latest);
   }
+}
+
+function drawLegendRow(configItem, baseX, row, rowHeight, latest) {
+  if (!configItem) return;
+
+  const y = (height - 250) + row * rowHeight;
+  const index = indicatorConfig.findIndex((item) => item.key === configItem.key);
+  const flowerCount = getFlowerCount(latest, configItem.key);
+
+  // Draw one example flower.
+  image(flowerImages[index], baseX + 12, y, 30, 30);
+
+  // Show label.
+  fill("#e8eaf0");
+  textSize(13);
+  text(configItem.label, baseX + 34, y - 9);
+
+  // Show real flower count currently rendered in the garden.
+  fill("#9ea4b4");
+  textSize(12);
+  text("Flowers: " + flowerCount, baseX + 34, y + 10);
 }
 
 function drawFooter() {
