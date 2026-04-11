@@ -13,6 +13,7 @@ let countryIndex = 0;
 let flowerImages = [];
 let flowerCloud = [];
 let flowerCloudKey = "";
+let branchTips = [];
 
 // These values come from the control page.
 const params = {
@@ -36,10 +37,12 @@ const indicatorConfig = [
 const TREE_SETTINGS = {
   trunkMin: 95,
   trunkMax: 125,
-  depthMin: 2,
-  depthMax: 3,
-  spreadMin: 11,
-  spreadMax: 16,
+  depthMin: 4,
+  depthMax: 5,
+  spreadMin: 14,
+  spreadMax: 21,
+  maxTips: 30,
+  altTurnBoost: 7,
 };
 
 function preload() {
@@ -106,8 +109,8 @@ function draw() {
   // Rebuild the flower layout when the country changes.
   const currentKey = country.country + "-" + latest.year;
   if (currentKey !== flowerCloudKey) {
-    buildFlowerCloud(latest);
     flowerCloudKey = currentKey;
+    flowerCloud = [];
   }
 
   drawHeader(country, latest);
@@ -133,7 +136,12 @@ function drawHeader(country, latest) {
 function drawTree(latest) {
   // Draw the tree first, then draw the flowers.
   const counts = indicatorConfig.map((conf) => getFlowerCount(latest, conf.key));
-  drawRecursiveTree(counts);
+  branchTips = drawRecursiveTree(counts);
+
+  // Build flowers once per country/year, using branch tips only.
+  if (flowerCloud.length === 0) {
+    buildFlowerCloud(latest, branchTips);
+  }
 
   for (let i = 0; i < flowerCloud.length; i++) {
     const flower = flowerCloud[i];
@@ -146,7 +154,7 @@ function drawTree(latest) {
 }
 
 function drawRecursiveTree(counts) {
-  // Draw one white tree. More flowers = bigger tree and more branches.
+  // Draw one white tree. More flowers = bigger tree and more branch levels.
   const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
   const leftFlowers = counts[0] + counts[2];
   const rightFlowers = counts[1] + counts[3];
@@ -165,32 +173,37 @@ function drawRecursiveTree(counts) {
   // 3) How much branches spread left/right.
   const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
 
-  push();
-  translate(width / 2, height - 120);
-  // Small lean so the trunk does not feel perfectly centered/cone-like.
-  rotate(sideBalance * 2.2);
+  const tips = [];
+  const startX = width / 2;
+  const startY = height - 120;
+  const startAngle = -90 + sideBalance * 2.2;
+
   stroke(255);
   noFill();
-  drawBranch(trunkLength, branchDepth, branchSpread, counts, sideBalance);
-  pop();
+  drawBranch(startX, startY, trunkLength, startAngle, branchDepth, branchSpread, counts, sideBalance, 0, tips);
+
+  return tips;
 }
 
-function drawBranch(len, depth, spread, counts, sideBalance) {
+function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level, tips) {
   // len: current branch size (smaller each level)
   // depth: how many split levels are left (higher = more branches)
   // spread: left/right branch angle
   // counts: flower totals used to shape left vs right side
-  if (len < 9 || depth <= 0) {
+  if (len < 9 || depth <= 0 || tips.length >= TREE_SETTINGS.maxTips) {
     return;
   }
 
+  const nx = x + cos(angle) * len;
+  const ny = y + sin(angle) * len;
+
   // Branch thickness follows branch length so twigs are thin.
   strokeWeight(map(len, 10, TREE_SETTINGS.trunkMax, 1, 10));
-  line(0, 0, 0, -len);
-  translate(0, -len);
+  line(x, y, nx, ny);
 
   // Last level: stop splitting here.
   if (depth === 1) {
+    tips.push({ x: nx, y: ny });
     return;
   }
 
@@ -199,8 +212,8 @@ function drawBranch(len, depth, spread, counts, sideBalance) {
   const rightFlowers = counts[1] + counts[3];
 
   // More flowers on a side -> that side opens a bit wider.
-  const leftAngle = map(leftFlowers, 0, 20, spread - 5, spread + 7);
-  const rightAngle = map(rightFlowers, 0, 20, spread - 5, spread + 7);
+  const leftAngle = map(leftFlowers, 0, 20, spread * 0.8, spread * 1.28);
+  const rightAngle = map(rightFlowers, 0, 20, spread * 0.8, spread * 1.28);
 
   // Child branch length controls how dense/full the tree looks.
   const leftLen = len * map(leftFlowers, 0, 20, 0.67, 0.82);
@@ -209,20 +222,13 @@ function drawBranch(len, depth, spread, counts, sideBalance) {
   // Angle gets a little smaller at each level for natural tapering.
   const nextSpread = spread * 0.9;
 
-  // Give deeper levels a gentle alternating bend to avoid a strict cone shape.
-  const wobble = (depth % 2 === 0 ? 1 : -1) * 3.2;
-  const leftTurn = leftAngle + wobble + sideBalance * 2;
-  const rightTurn = rightAngle - wobble - sideBalance * 2;
+  // Alternate the turn amounts each level so the split is less cone-like.
+  const alt = level % 2 === 0 ? TREE_SETTINGS.altTurnBoost : -TREE_SETTINGS.altTurnBoost;
+  const leftTurn = constrain(leftAngle + alt + sideBalance * 2, 8, 58);
+  const rightTurn = constrain(rightAngle - alt - sideBalance * 2, 8, 58);
 
-  push();
-  rotate(leftTurn);
-  drawBranch(leftLen, depth - 1, nextSpread, counts, sideBalance);
-  pop();
-
-  push();
-  rotate(-rightTurn);
-  drawBranch(rightLen, depth - 1, nextSpread, counts, sideBalance);
-  pop();
+  drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips);
+  drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips);
 }
 
 function getFlowerCount(latest, indicatorKey) {
@@ -232,56 +238,37 @@ function getFlowerCount(latest, indicatorKey) {
   return Math.round(score01 * 10);
 }
 
-function buildFlowerCloud(latest) {
-  // Put flowers in the middle without letting them touch.
+function buildFlowerCloud(latest, tips) {
+  // Place flowers only at branch ends.
   flowerCloud = [];
 
-  const totalFlowers = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
+  if (!tips || tips.length === 0) {
+    return;
+  }
 
-  const bounds = {
-    minX: width * 0.36,
-    maxX: width * 0.64,
-    minY: height * 0.22,
-    maxY: height * 0.56,
-  };
-
-  // More flowers -> allow slightly tighter spacing so canopy looks full.
-  const minDistance = map(totalFlowers, 0, 40, 34, 26);
-  const maxAttemptsPerFlower = 700;
+  // Keep flowers near tip points; extra flowers stack in tiny rings around the same tip.
+  const perTipCount = new Array(tips.length).fill(0);
+  let globalPlaced = 0;
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const count = getFlowerCount(latest, indicatorConfig[i].key);
 
     for (let n = 0; n < count; n++) {
-      let placed = false;
+      const tipIndex = globalPlaced % tips.length;
+      const tip = tips[tipIndex];
+      const ringIndex = perTipCount[tipIndex];
+      const radius = ringIndex * 4;
+      const angle = (ringIndex * 137) % 360;
 
-      for (let attempt = 0; attempt < maxAttemptsPerFlower; attempt++) {
-        const x = random(bounds.minX, bounds.maxX);
-        const y = random(bounds.minY, bounds.maxY);
+      flowerCloud.push({
+        x: tip.x + cos(angle) * radius,
+        y: tip.y + sin(angle) * radius,
+        flowerIndex: i,
+        rotation: random(-0.45, 0.45),
+      });
 
-        // Keep only a small open area so flowers are clustered closer together.
-        if (x > width * 0.47 && x < width * 0.53 && y > height * 0.24 && y < height * 0.41) {
-          continue;
-        }
-
-        // Do not place a flower too close to another one.
-        const overlaps = flowerCloud.some((flower) => dist(x, y, flower.x, flower.y) < minDistance);
-        if (!overlaps) {
-          flowerCloud.push({
-            x,
-            y,
-            flowerIndex: i,
-            rotation: random(-0.45, 0.45),
-          });
-          placed = true;
-          break;
-        }
-      }
-
-      if (!placed) {
-        // Skip this flower when there is no free room, to avoid overlap.
-        continue;
-      }
+      perTipCount[tipIndex] += 1;
+      globalPlaced += 1;
     }
   }
 }
