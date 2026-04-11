@@ -34,12 +34,12 @@ const indicatorConfig = [
 // depthMin / depthMax: controls how many branch levels are drawn.
 // spreadMin / spreadMax: controls how wide branches open.
 const TREE_SETTINGS = {
-  trunkMin: 125,
-  trunkMax: 175,
-  depthMin: 3,
-  depthMax: 5,
-  spreadMin: 12,
-  spreadMax: 21,
+  trunkMin: 100,
+  trunkMax: 155,
+  depthMin: 4,
+  depthMax: 6,
+  spreadMin: 14,
+  spreadMax: 24,
 };
 
 function preload() {
@@ -153,13 +153,17 @@ function drawRecursiveTree(counts) {
   const trunkLength = map(totalFlowers, 0, 40, TREE_SETTINGS.trunkMin, TREE_SETTINGS.trunkMax);
 
   // 2) Amount of branches (depth of recursion).
-  const branchDepth = constrain(Math.floor(map(totalFlowers, 0, 40, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax)), TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax);
+  const branchDepth = constrain(
+    Math.ceil(map(totalFlowers, 0, 40, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax)),
+    TREE_SETTINGS.depthMin,
+    TREE_SETTINGS.depthMax,
+  );
 
   // 3) How much branches spread left/right.
   const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
 
   push();
-  translate(width / 2, height - 130);
+  translate(width / 2, height - 120);
   stroke(255);
   noFill();
   drawBranch(trunkLength, branchDepth, branchSpread, counts);
@@ -167,26 +171,38 @@ function drawRecursiveTree(counts) {
 }
 
 function drawBranch(len, depth, spread, counts) {
-  // Draw one branch, then split it into two smaller branches.
-  if (len < 8 || depth <= 0) {
+  // len: current branch size (smaller each level)
+  // depth: how many split levels are left (higher = more branches)
+  // spread: left/right branch angle
+  // counts: flower totals used to shape left vs right side
+  if (len < 6 || depth <= 0) {
     return;
   }
 
+  // Branch thickness follows branch length so twigs are thin.
   strokeWeight(map(len, 10, TREE_SETTINGS.trunkMax, 1, 10));
   line(0, 0, 0, -len);
   translate(0, -len);
 
+  // Last level: stop splitting here.
   if (depth === 1) {
     return;
   }
 
+  // Left side uses blue+green flowers, right side uses pink+yellow.
   const leftFlowers = counts[0] + counts[2];
   const rightFlowers = counts[1] + counts[3];
+
+  // More flowers on a side -> that side opens a bit wider.
   const leftAngle = map(leftFlowers, 0, 20, spread - 5, spread + 7);
   const rightAngle = map(rightFlowers, 0, 20, spread - 5, spread + 7);
-  const leftLen = len * map(leftFlowers, 0, 20, 0.62, 0.78);
-  const rightLen = len * map(rightFlowers, 0, 20, 0.62, 0.78);
-  const nextSpread = spread * 0.88;
+
+  // Child branch length controls how dense/full the tree looks.
+  const leftLen = len * map(leftFlowers, 0, 20, 0.64, 0.81);
+  const rightLen = len * map(rightFlowers, 0, 20, 0.64, 0.81);
+
+  // Angle gets a little smaller at each level for natural tapering.
+  const nextSpread = spread * 0.9;
 
   push();
   rotate(leftAngle);
@@ -210,15 +226,18 @@ function buildFlowerCloud(latest) {
   // Put flowers in the middle without letting them touch.
   flowerCloud = [];
 
+  const totalFlowers = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
+
   const bounds = {
-    minX: width * 0.28,
-    maxX: width * 0.72,
-    minY: height * 0.16,
-    maxY: height * 0.63,
+    minX: width * 0.34,
+    maxX: width * 0.66,
+    minY: height * 0.2,
+    maxY: height * 0.58,
   };
 
-  const minDistance = 34;
-  const maxAttemptsPerFlower = 220;
+  // More flowers -> allow slightly tighter spacing so canopy looks full.
+  const minDistance = map(totalFlowers, 0, 40, 30, 20);
+  const maxAttemptsPerFlower = 400;
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     const count = getFlowerCount(latest, indicatorConfig[i].key);
@@ -230,8 +249,8 @@ function buildFlowerCloud(latest) {
         const x = random(bounds.minX, bounds.maxX);
         const y = random(bounds.minY, bounds.maxY);
 
-        // Leave a little open space in the middle.
-        if (x > width * 0.43 && x < width * 0.57 && y > height * 0.18 && y < height * 0.46) {
+        // Keep only a small open area so flowers are clustered closer together.
+        if (x > width * 0.47 && x < width * 0.53 && y > height * 0.24 && y < height * 0.41) {
           continue;
         }
 
@@ -250,12 +269,8 @@ function buildFlowerCloud(latest) {
       }
 
       if (!placed) {
-        flowerCloud.push({
-          x: random(bounds.minX, bounds.maxX),
-          y: random(bounds.minY, bounds.maxY),
-          flowerIndex: i,
-          rotation: random(-0.45, 0.45),
-        });
+        // Skip this flower when there is no free room, to avoid overlap.
+        continue;
       }
     }
   }
