@@ -13,6 +13,7 @@ let countryIndex = 0;
 let flowerImages = [];
 let flowerCloud = [];
 let flowerCloudKey = "";
+const ROTATE_CANVAS_90 = true;
 
 // These values come from the control page.
 const params = {
@@ -60,7 +61,11 @@ function toCountryArray(rawData) {
 function setup() {
   // Make the drawing area and center the images.
   // A3 portrait-like ratio (about 1:1.414).
-  createCanvas(900, 1273);
+  const canvas = createCanvas(900, 1273);
+  if (ROTATE_CANVAS_90) {
+    canvas.elt.style.transform = "rotate(90deg)";
+    canvas.elt.style.transformOrigin = "center center";
+  }
   imageMode(CENTER);
   angleMode(DEGREES);
 
