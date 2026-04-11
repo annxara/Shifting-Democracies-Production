@@ -27,6 +27,10 @@ const indicatorConfig = [
   { key: "v2x_polyarchy", label: "Polyarchy", image: "pictures/forgetmenot_pink.png" },
   { key: "v2x_partipdem", label: "Participatory Democracy", image: "pictures/forgetmenot_green.png" },
   { key: "v2x_delibdem", label: "Deliberative Democracy", image: "pictures/forgetmenot_yellow.png" },
+  { key: "stfdem", label: "Satisfaction with Democracy", image: "pictures/forgetmenot_red.png" },
+  { key: "stfeco", label: "Satisfaction with Economy", image: "pictures/forgetmenot_babyblue.png" },
+  { key: "stflife", label: "Satisfaction with Life", image: "pictures/forgetmenot_magenta.png" },
+  { key: "stfgov", label: "Satisfaction with Government", image: "pictures/forgetmenot_grassgreen.png" },
 ];
 
 
@@ -285,130 +289,21 @@ function drawSingleFlower(f) {
 }
 
 
-
-/*function drawRecursiveTree(counts) {
-  // Draw one white tree. More flowers = bigger tree and more branch levels.
-  const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
-  const desiredTips = Math.max(40, totalFlowers);
-  const leftFlowers = counts[0] + counts[2];
-  const rightFlowers = counts[1] + counts[3];
-  const sideBalance = constrain((leftFlowers - rightFlowers) / 20, -1, 1);
-
-  // 1) Main size of the tree.
-  const trunkLength = map(totalFlowers, 0, 40, TREE_SETTINGS.trunkMin, TREE_SETTINGS.trunkMax);
-
-  // 2) Amount of branches (depth of recursion).
-  const requiredDepth = Math.ceil(Math.log2(desiredTips)) + 1;
-  const branchDepth = constrain(requiredDepth, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax);
-
-  // 3) First split spacing (small at trunk, then grows by layer).
-  const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
-
-  const tips = [];
-  const startX = width / 2;
-  const startY = height - 120;
-  const startAngle = -90 + sideBalance * 0.8;
-
-  stroke(255);
-  noFill();
-  drawBranch(startX, startY, trunkLength, startAngle, branchDepth, branchSpread, counts, sideBalance, 0, tips, desiredTips);
-
-  return tips;
-}
-
-function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level, tips, desiredTips) {
-  // len: current branch size (smaller each level)
-  // depth: how many split levels are left (higher = more branches)
-  // spread: left/right branch angle
-  // counts: flower totals used to shape left vs right side
-  if (len < 4 || depth <= 0 || tips.length >= Math.min(TREE_SETTINGS.maxTips, desiredTips)) {
-    return;
-  }
-
-  const nx = x + cos(angle) * len;
-  const ny = y + sin(angle) * len;
-
-  // Branch thickness follows branch length so twigs are thin.
-  strokeWeight(map(len, 10, TREE_SETTINGS.trunkMax, 1, 10));
-  line(x, y, nx, ny);
-
-  // Last level: stop splitting here.
-  if (depth === 1) {
-    const tipSize = constrain(map(len, 4, TREE_SETTINGS.trunkMax * 0.45, 38, 62), 34, 64);
-    tips.push({ x: nx, y: ny, tipSize });
-    return;
-  }
-
-  // Left side uses blue+green flowers, right side uses pink+yellow.
-  const leftFlowers = counts[0] + counts[2];
-  const rightFlowers = counts[1] + counts[3];
-
-  // More flowers on a side -> that side opens a bit wider.
-  const leftAngle = map(leftFlowers, 0, 20, spread * 0.9, spread * 1.08);
-  const rightAngle = map(rightFlowers, 0, 20, spread * 0.9, spread * 1.08);
-
-  // Branch size rule: every next layer is about 3/4 of the previous one.
-  const leftLen = len * TREE_SETTINGS.childScale;
-  const rightLen = len * TREE_SETTINGS.childScale;
-
-  // Spacing rule: each deeper layer has wider spacing than the previous one.
-  const nextSpread = Math.min(spread * TREE_SETTINGS.spreadGrowth, TREE_SETTINGS.spreadCap);
-
-  // Alternate tiny turn offsets to avoid perfectly mirrored branching.
-  const alt = level % 2 === 0 ? TREE_SETTINGS.altTurnBoost : -TREE_SETTINGS.altTurnBoost;
-  const leftTurn = constrain(leftAngle + alt + sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
-  const rightTurn = constrain(rightAngle - alt - sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
-
-
-  drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
-  drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
-}
-*/
-
 function getFlowerCount(latest, indicatorKey) {
-  // Turn a value from 0 to 1 into a flower count from 0 to 10.
+  // Support two scales:
+  // - 0..1 (democracy index scores)
+  // - 0..10 (survey satisfaction scores)
+  // Both become a flower count from 0 to 10.
   const rawValue = Number(latest[indicatorKey]);
-  const score01 = Number.isFinite(rawValue) ? constrain(rawValue, 0, 1) : 0;
-  return Math.round(score01 * 10);
-}
+  if (!Number.isFinite(rawValue)) return 0;
 
-/*function buildFlowerCloud(latest, tips) {
-  // Place flowers only at branch ends.
-  flowerCloud = [];
-
-  if (!tips || tips.length === 0) {
-    return;
+  if (rawValue <= 1) {
+    return Math.round(constrain(rawValue, 0, 1) * 10);
   }
 
-  // Keep flowers near tip points; extra flowers stack in tiny rings around the same tip.
-  const perTipCount = new Array(tips.length).fill(0);
-  let globalPlaced = 0;
-
-  for (let i = 0; i < indicatorConfig.length; i++) {
-    const count = getFlowerCount(latest, indicatorConfig[i].key);
-
-    for (let n = 0; n < count; n++) {
-      const tipIndex = globalPlaced % tips.length;
-      const tip = tips[tipIndex];
-      const ringIndex = perTipCount[tipIndex];
-      const radius = ringIndex * (tip.tipSize * 0.38 + 2);
-      const angle = (ringIndex * 137) % 360;
-      const size = constrain(tip.tipSize * random(0.9, 1.1), 34, 66);
-
-      flowerCloud.push({
-        x: tip.x + cos(angle) * radius,
-        y: tip.y + sin(angle) * radius,
-        flowerIndex: i,
-        rotation: random(-0.45, 0.45),
-        size,
-      });
-
-      perTipCount[tipIndex] += 1;
-      globalPlaced += 1;
-    }
-  }
+  return Math.round(constrain(rawValue, 0, 10));
 }
-*/
+
 function drawLegend() {
   // Show which flower color belongs to which variable.
   const legendY = height - 110;
@@ -576,3 +471,123 @@ function connectSocket() {
     applyFilterAndResetIndex();
   });
 }
+
+
+
+/*function drawRecursiveTree(counts) {
+  // Draw one white tree. More flowers = bigger tree and more branch levels.
+  const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
+  const desiredTips = Math.max(40, totalFlowers);
+  const leftFlowers = counts[0] + counts[2];
+  const rightFlowers = counts[1] + counts[3];
+  const sideBalance = constrain((leftFlowers - rightFlowers) / 20, -1, 1);
+
+  // 1) Main size of the tree.
+  const trunkLength = map(totalFlowers, 0, 40, TREE_SETTINGS.trunkMin, TREE_SETTINGS.trunkMax);
+
+  // 2) Amount of branches (depth of recursion).
+  const requiredDepth = Math.ceil(Math.log2(desiredTips)) + 1;
+  const branchDepth = constrain(requiredDepth, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax);
+
+  // 3) First split spacing (small at trunk, then grows by layer).
+  const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
+
+  const tips = [];
+  const startX = width / 2;
+  const startY = height - 120;
+  const startAngle = -90 + sideBalance * 0.8;
+
+  stroke(255);
+  noFill();
+  drawBranch(startX, startY, trunkLength, startAngle, branchDepth, branchSpread, counts, sideBalance, 0, tips, desiredTips);
+
+  return tips;
+}
+
+function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level, tips, desiredTips) {
+  // len: current branch size (smaller each level)
+  // depth: how many split levels are left (higher = more branches)
+  // spread: left/right branch angle
+  // counts: flower totals used to shape left vs right side
+  if (len < 4 || depth <= 0 || tips.length >= Math.min(TREE_SETTINGS.maxTips, desiredTips)) {
+    return;
+  }
+
+  const nx = x + cos(angle) * len;
+  const ny = y + sin(angle) * len;
+
+  // Branch thickness follows branch length so twigs are thin.
+  strokeWeight(map(len, 10, TREE_SETTINGS.trunkMax, 1, 10));
+  line(x, y, nx, ny);
+
+  // Last level: stop splitting here.
+  if (depth === 1) {
+    const tipSize = constrain(map(len, 4, TREE_SETTINGS.trunkMax * 0.45, 38, 62), 34, 64);
+    tips.push({ x: nx, y: ny, tipSize });
+    return;
+  }
+
+  // Left side uses blue+green flowers, right side uses pink+yellow.
+  const leftFlowers = counts[0] + counts[2];
+  const rightFlowers = counts[1] + counts[3];
+
+  // More flowers on a side -> that side opens a bit wider.
+  const leftAngle = map(leftFlowers, 0, 20, spread * 0.9, spread * 1.08);
+  const rightAngle = map(rightFlowers, 0, 20, spread * 0.9, spread * 1.08);
+
+  // Branch size rule: every next layer is about 3/4 of the previous one.
+  const leftLen = len * TREE_SETTINGS.childScale;
+  const rightLen = len * TREE_SETTINGS.childScale;
+
+  // Spacing rule: each deeper layer has wider spacing than the previous one.
+  const nextSpread = Math.min(spread * TREE_SETTINGS.spreadGrowth, TREE_SETTINGS.spreadCap);
+
+  // Alternate tiny turn offsets to avoid perfectly mirrored branching.
+  const alt = level % 2 === 0 ? TREE_SETTINGS.altTurnBoost : -TREE_SETTINGS.altTurnBoost;
+  const leftTurn = constrain(leftAngle + alt + sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
+  const rightTurn = constrain(rightAngle - alt - sideBalance * 0.8, 6, TREE_SETTINGS.spreadCap);
+
+
+  drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
+  drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
+}
+*/
+
+
+/*function buildFlowerCloud(latest, tips) {
+  // Place flowers only at branch ends.
+  flowerCloud = [];
+
+  if (!tips || tips.length === 0) {
+    return;
+  }
+
+  // Keep flowers near tip points; extra flowers stack in tiny rings around the same tip.
+  const perTipCount = new Array(tips.length).fill(0);
+  let globalPlaced = 0;
+
+  for (let i = 0; i < indicatorConfig.length; i++) {
+    const count = getFlowerCount(latest, indicatorConfig[i].key);
+
+    for (let n = 0; n < count; n++) {
+      const tipIndex = globalPlaced % tips.length;
+      const tip = tips[tipIndex];
+      const ringIndex = perTipCount[tipIndex];
+      const radius = ringIndex * (tip.tipSize * 0.38 + 2);
+      const angle = (ringIndex * 137) % 360;
+      const size = constrain(tip.tipSize * random(0.9, 1.1), 34, 66);
+
+      flowerCloud.push({
+        x: tip.x + cos(angle) * radius,
+        y: tip.y + sin(angle) * radius,
+        flowerIndex: i,
+        rotation: random(-0.45, 0.45),
+        size,
+      });
+
+      perTipCount[tipIndex] += 1;
+      globalPlaced += 1;
+    }
+  }
+}
+*/
