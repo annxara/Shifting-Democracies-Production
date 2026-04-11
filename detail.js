@@ -55,6 +55,7 @@ function setup() {
   // Make the drawing area and center the images.
   createCanvas(980, 760);
   imageMode(CENTER);
+  angleMode(DEGREES);
 
   // Make the data ready to use.
   countryData = toCountryArray(countryData);
@@ -117,15 +118,9 @@ function drawHeader(country, latest) {
 }
 
 function drawTree(latest) {
-  // Draw the tree, then draw the flowers.
-  const trunkBaseX = width / 2;
-  const trunkTopY = 155;
-  const trunkBaseY = height - 150;
-  const canopyCenterX = width / 2;
-  const canopyCenterY = height / 2 - 50;
-
-  drawOrganicTrunk(trunkBaseX, trunkTopY, trunkBaseY);
-  drawOrganicBranches(trunkBaseX, trunkTopY, canopyCenterX, canopyCenterY);
+  // Draw the tree first, then draw the flowers.
+  const counts = indicatorConfig.map((conf) => getFlowerCount(latest, conf.key));
+  drawRecursiveTree(counts);
 
   for (let i = 0; i < flowerCloud.length; i++) {
     const flower = flowerCloud[i];
@@ -137,85 +132,52 @@ function drawTree(latest) {
   }
 }
 
-function drawOrganicTrunk(baseX, topY, baseY) {
-  // Draw the tree trunk with a soft curve.
-  const midY1 = lerp(topY, baseY, 0.33);
-  const midY2 = lerp(topY, baseY, 0.68);
+function drawRecursiveTree(counts) {
+  // Draw one white tree whose shape depends on the flower totals.
+  const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
+  const trunkLength = map(totalFlowers, 0, 40, 175, 240);
+  const branchDepth = Math.max(3, Math.min(6, Math.ceil(totalFlowers / 7)));
+  const branchSpread = map(totalFlowers, 0, 40, 16, 28);
 
-  const offsets = [-18, -10, -4, 0, 3, 6, 4, 0, -3, -1];
-  const points = [
-    { x: baseX + offsets[0], y: baseY },
-    { x: baseX + offsets[1], y: midY2 },
-    { x: baseX + offsets[2], y: midY1 },
-    { x: baseX + offsets[3], y: topY },
-  ];
-
+  push();
+  translate(width / 2, height - 145);
+  stroke(255);
   noFill();
-  strokeCap(ROUND);
-  strokeJoin(ROUND);
-
-  stroke("#2f241f");
-  strokeWeight(34);
-  beginShape();
-  curveVertex(points[0].x, points[0].y + 30);
-  for (let i = 0; i < points.length; i++) {
-    curveVertex(points[i].x, points[i].y);
-  }
-  curveVertex(points[points.length - 1].x + 2, points[points.length - 1].y - 20);
-  endShape();
-
-  stroke("#5a4638");
-  strokeWeight(16);
-  beginShape();
-  curveVertex(points[0].x + 8, points[0].y + 18);
-  for (let i = 0; i < points.length; i++) {
-    curveVertex(points[i].x + 8, points[i].y);
-  }
-  curveVertex(points[points.length - 1].x + 12, points[points.length - 1].y - 18);
-  endShape();
+  drawBranch(trunkLength, branchDepth, branchSpread, counts, 0);
+  pop();
 }
 
-function drawBranchPath(startX, startY, endX, endY, curl) {
-  // Draw one branch with a small bend.
-  noFill();
-  strokeCap(ROUND);
-  strokeJoin(ROUND);
-
-  stroke("#2d211b");
-  strokeWeight(12);
-  beginShape();
-  curveVertex(startX, startY + 20);
-  curveVertex(startX, startY + 20);
-  curveVertex(lerp(startX, endX, 0.35) + curl, lerp(startY, endY, 0.32));
-  curveVertex(lerp(startX, endX, 0.68) - curl * 0.7, lerp(startY, endY, 0.72));
-  curveVertex(endX, endY);
-  endShape();
-
-  stroke("#6a523f");
-  strokeWeight(5);
-  beginShape();
-  curveVertex(startX + 1, startY + 16);
-  curveVertex(startX + 1, startY + 16);
-  curveVertex(lerp(startX, endX, 0.35) + curl * 0.5, lerp(startY, endY, 0.32) - 2);
-  curveVertex(lerp(startX, endX, 0.68) - curl * 0.35, lerp(startY, endY, 0.72) - 2);
-  curveVertex(endX, endY);
-  endShape();
-}
-
-function drawOrganicBranches(baseX, topY, canopyCenterX, canopyCenterY) {
-  // Draw several branches that spread out
-  const branches = [
-    { x: baseX - 10, y: topY + 190, ex: canopyCenterX - 150, ey: canopyCenterY + 90, curl: -28 },
-    { x: baseX + 6, y: topY + 165, ex: canopyCenterX + 140, ey: canopyCenterY + 55, curl: 24 },
-    { x: baseX - 8, y: topY + 120, ex: canopyCenterX - 110, ey: canopyCenterY - 10, curl: -18 },
-    { x: baseX + 4, y: topY + 95, ex: canopyCenterX + 100, ey: canopyCenterY - 25, curl: 16 },
-    { x: baseX - 3, y: topY + 60, ex: canopyCenterX - 55, ey: canopyCenterY - 75, curl: -12 },
-    { x: baseX + 1, y: topY + 45, ex: canopyCenterX + 55, ey: canopyCenterY - 82, curl: 10 },
-  ];
-
-  for (let i = 0; i < branches.length; i++) {
-    drawBranchPath(branches[i].x, branches[i].y, branches[i].ex, branches[i].ey, branches[i].curl);
+function drawBranch(len, depth, spread, counts, level) {
+  // Draw one branch, then split it into two smaller branches.
+  if (len < 8 || depth <= 0) {
+    return;
   }
+
+  strokeWeight(map(len, 10, 240, 1, 14));
+  line(0, 0, 0, -len);
+  translate(0, -len);
+
+  if (depth === 1) {
+    return;
+  }
+
+  const leftFlowers = counts[0] + counts[2];
+  const rightFlowers = counts[1] + counts[3];
+  const leftAngle = map(leftFlowers, 0, 20, spread - 5, spread + 7);
+  const rightAngle = map(rightFlowers, 0, 20, spread - 5, spread + 7);
+  const leftLen = len * map(leftFlowers, 0, 20, 0.66, 0.84);
+  const rightLen = len * map(rightFlowers, 0, 20, 0.66, 0.84);
+  const nextSpread = spread * 0.86;
+
+  push();
+  rotate(leftAngle);
+  drawBranch(leftLen, depth - 1, nextSpread, counts, level + 1);
+  pop();
+
+  push();
+  rotate(-rightAngle);
+  drawBranch(rightLen, depth - 1, nextSpread, counts, level + 1);
+  pop();
 }
 
 function getFlowerCount(latest, indicatorKey) {
