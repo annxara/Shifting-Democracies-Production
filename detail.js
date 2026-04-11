@@ -132,7 +132,7 @@ function draw() {
   drawHeader(country, latest);
   drawTree(latest);
   drawLegend(latest);
-  drawFooter();
+  //drawFooter();
 }
 
 function drawHeader(country, latest) {
@@ -142,7 +142,7 @@ function drawHeader(country, latest) {
   const panelW = width - 48;
   const panelH = HEADER_BLOCK_HEIGHT - 26;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#141b2ccc", "#2b3448");
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
 
   fill("#f7f9ff");
   noStroke();
@@ -182,7 +182,7 @@ function buildMemoryField(latest) {
     minX: 70,
     maxX: width - 70,
     minY: HEADER_BLOCK_HEIGHT + 34,
-    maxY: height - LEGEND_BLOCK_HEIGHT - 42,
+    maxY: height - LEGEND_BLOCK_HEIGHT - 60,
   };
 
   // Build evenly spaced anchors for all indicators inside the flower area.
