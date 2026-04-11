@@ -435,9 +435,9 @@ function drawLegend(latest) {
   const vDemIndicators = indicatorConfig.filter((item) => item.key.startsWith("v2x_"));
   const essIndicators = indicatorConfig.filter((item) => item.key.startsWith("stf"));
 
-  const panelX = 40;
+  const panelX = 72;
   const panelY = height - LEGEND_BLOCK_HEIGHT;
-  const panelW = width - 80;
+  const panelW = width - 144;
   const panelH = LEGEND_BLOCK_HEIGHT;
   const startX = panelX + 18;
   const contentWidth = panelW - 36;
