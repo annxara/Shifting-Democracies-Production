@@ -158,7 +158,7 @@ function buildMemoryField(latest) {
 
     // One flower per rounded score point (0..10), same mapping as before.
     for (let n = 0; n < count; n++) {
-      const size = random(28, 72);
+      const size = 75;
       const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, 145);
 
       flowers.push({
