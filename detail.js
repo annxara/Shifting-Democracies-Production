@@ -154,15 +154,13 @@ function drawTree(latest) {
   updateAndDrawFlowers();
 }
 function buildMemoryField(latest) {
-  // Create flowers that start near the center and settle into a garden.
+  // Create flowers that start at random positions, then settle into clusters.
 
   const flowers = [];
   const totalFlowerCount = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
   const flowerSize = getFlowerVisualSize(totalFlowerCount);
   const clusterRadius = constrain(map(totalFlowerCount, 20, 80, 112, 90), 86, 116);
 
-  const centerX = width / 2;
-  const centerY = height / 2 + 20;
   const bounds = {
     minX: 70,
     maxX: width - 70,
@@ -184,8 +182,8 @@ function buildMemoryField(latest) {
       const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, clusterRadius);
 
       flowers.push({
-        x: centerX + random(-20, 20),
-        y: centerY + random(-20, 20),
+        x: random(0, width),
+        y: random(0, height),
         tx: target.x,
         ty: target.y,
         ax: anchor.x,
@@ -210,17 +208,23 @@ function getFlowerVisualSize(totalFlowerCount) {
 }
 
 function buildGridAnchors(anchorCount, bounds) {
-  const columns = 2;
-  const rows = Math.ceil(anchorCount / columns);
+  // Match legend order:
+  // - left column: first half of indicators (V-Dem)
+  // - right column: second half (ESS)
+  const half = Math.ceil(anchorCount / 2);
+  const leftCount = half;
+  const rightCount = anchorCount - half;
+  const maxRows = Math.max(leftCount, rightCount);
   const anchors = [];
-  const horizontalStep = (bounds.maxX - bounds.minX) / (columns + 1);
-  const verticalStep = (bounds.maxY - bounds.minY) / (rows + 1);
+  const leftX = bounds.minX + (bounds.maxX - bounds.minX) * 0.32;
+  const rightX = bounds.minX + (bounds.maxX - bounds.minX) * 0.68;
+  const verticalStep = (bounds.maxY - bounds.minY) / (maxRows + 1);
 
   for (let i = 0; i < anchorCount; i++) {
-    const column = i % columns;
-    const row = Math.floor(i / columns);
+    const isLeftColumn = i < half;
+    const row = isLeftColumn ? i : i - half;
     anchors.push({
-      x: bounds.minX + horizontalStep * (column + 1),
+      x: isLeftColumn ? leftX : rightX,
       y: bounds.minY + verticalStep * (row + 1),
     });
   }
