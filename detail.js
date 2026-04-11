@@ -204,14 +204,25 @@ function drawBranch(len, depth, spread, counts) {
   // Angle gets a little smaller at each level for natural tapering.
   const nextSpread = spread * 0.9;
 
+  // Split into 4 children: far-left, left, right, far-right.
   push();
-  rotate(leftAngle);
+  rotate(leftAngle + nextSpread * 0.45);
+  drawBranch(leftLen * 0.9, depth - 1, nextSpread, counts);
+  pop();
+
+  push();
+  rotate(leftAngle * 0.55);
   drawBranch(leftLen, depth - 1, nextSpread, counts);
   pop();
 
   push();
-  rotate(-rightAngle);
+  rotate(-rightAngle * 0.55);
   drawBranch(rightLen, depth - 1, nextSpread, counts);
+  pop();
+
+  push();
+  rotate(-(rightAngle + nextSpread * 0.45));
+  drawBranch(rightLen * 0.9, depth - 1, nextSpread, counts);
   pop();
 }
 
