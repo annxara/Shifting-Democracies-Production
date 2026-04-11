@@ -37,11 +37,11 @@ const indicatorConfig = [
 const TREE_SETTINGS = {
   trunkMin: 95,
   trunkMax: 125,
-  depthMin:7,
+  depthMin: 6,
   depthMax: 10,
   spreadMin: 14,
   spreadMax: 21,
-  maxTips: 30,
+  maxTips: 80,
   altTurnBoost: 7,
 };
 
@@ -148,7 +148,7 @@ function drawTree(latest) {
     push();
     translate(flower.x, flower.y);
     rotate(flower.rotation);
-    image(flowerImages[flower.flowerIndex], 0, 0);
+    image(flowerImages[flower.flowerIndex], 0, 0, flower.size, flower.size);
     pop();
   }
 }
@@ -156,6 +156,7 @@ function drawTree(latest) {
 function drawRecursiveTree(counts) {
   // Draw one white tree. More flowers = bigger tree and more branch levels.
   const totalFlowers = counts.reduce((sum, value) => sum + value, 0);
+  const desiredTips = Math.max(40, totalFlowers);
   const leftFlowers = counts[0] + counts[2];
   const rightFlowers = counts[1] + counts[3];
   const sideBalance = constrain((leftFlowers - rightFlowers) / 20, -1, 1);
@@ -164,11 +165,8 @@ function drawRecursiveTree(counts) {
   const trunkLength = map(totalFlowers, 0, 40, TREE_SETTINGS.trunkMin, TREE_SETTINGS.trunkMax);
 
   // 2) Amount of branches (depth of recursion).
-  const branchDepth = constrain(
-    Math.ceil(map(totalFlowers, 0, 40, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax)),
-    TREE_SETTINGS.depthMin,
-    TREE_SETTINGS.depthMax,
-  );
+  const requiredDepth = Math.ceil(Math.log2(desiredTips)) + 1;
+  const branchDepth = constrain(requiredDepth, TREE_SETTINGS.depthMin, TREE_SETTINGS.depthMax);
 
   // 3) How much branches spread left/right.
   const branchSpread = map(totalFlowers, 0, 40, TREE_SETTINGS.spreadMin, TREE_SETTINGS.spreadMax);
@@ -180,17 +178,17 @@ function drawRecursiveTree(counts) {
 
   stroke(255);
   noFill();
-  drawBranch(startX, startY, trunkLength, startAngle, branchDepth, branchSpread, counts, sideBalance, 0, tips);
+  drawBranch(startX, startY, trunkLength, startAngle, branchDepth, branchSpread, counts, sideBalance, 0, tips, desiredTips);
 
   return tips;
 }
 
-function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level, tips) {
+function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level, tips, desiredTips) {
   // len: current branch size (smaller each level)
   // depth: how many split levels are left (higher = more branches)
   // spread: left/right branch angle
   // counts: flower totals used to shape left vs right side
-  if (len < 9 || depth <= 0 || tips.length >= TREE_SETTINGS.maxTips) {
+  if (len < 4 || depth <= 0 || tips.length >= Math.min(TREE_SETTINGS.maxTips, desiredTips)) {
     return;
   }
 
@@ -203,7 +201,8 @@ function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level,
 
   // Last level: stop splitting here.
   if (depth === 1) {
-    tips.push({ x: nx, y: ny });
+    const tipSize = constrain(map(len, 4, TREE_SETTINGS.trunkMax * 0.45, 38, 62), 34, 64);
+    tips.push({ x: nx, y: ny, tipSize });
     return;
   }
 
@@ -227,8 +226,8 @@ function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level,
   const leftTurn = constrain(leftAngle + alt + sideBalance * 2, 8, 58);
   const rightTurn = constrain(rightAngle - alt - sideBalance * 2, 8, 58);
 
-  drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips);
-  drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips);
+  drawBranch(nx, ny, leftLen, angle - leftTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
+  drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
 }
 
 function getFlowerCount(latest, indicatorKey) {
@@ -257,14 +256,16 @@ function buildFlowerCloud(latest, tips) {
       const tipIndex = globalPlaced % tips.length;
       const tip = tips[tipIndex];
       const ringIndex = perTipCount[tipIndex];
-      const radius = ringIndex * 4;
+      const radius = ringIndex * (tip.tipSize * 0.38 + 2);
       const angle = (ringIndex * 137) % 360;
+      const size = constrain(tip.tipSize * random(0.9, 1.1), 34, 66);
 
       flowerCloud.push({
         x: tip.x + cos(angle) * radius,
         y: tip.y + sin(angle) * radius,
         flowerIndex: i,
         rotation: random(-0.45, 0.45),
+        size,
       });
 
       perTipCount[tipIndex] += 1;
