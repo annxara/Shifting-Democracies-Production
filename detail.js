@@ -604,6 +604,27 @@ function applyFilterAndResetIndex() {
   countryIndex = 0;
   flowerCloud = [];
   flowerCloudKey = "";
+  emitCountryState();
+}
+
+function emitCountryState() {
+  if (!socket || filteredCountries.length === 0) {
+    if (socket) {
+      socket.emit("country-state", {
+        countries: [],
+        activeCountry: "",
+        activeIndex: 0,
+      });
+    }
+    return;
+  }
+
+  countryIndex = constrain(countryIndex, 0, filteredCountries.length - 1);
+  socket.emit("country-state", {
+    countries: filteredCountries.map((country) => country.country),
+    activeCountry: filteredCountries[countryIndex].country,
+    activeIndex: countryIndex,
+  });
 }
 
 function keyPressed() {
@@ -612,10 +633,12 @@ function keyPressed() {
 
   if (keyCode === RIGHT_ARROW) {
     countryIndex = (countryIndex + 1) % filteredCountries.length;
+    emitCountryState();
   }
 
   if (keyCode === LEFT_ARROW) {
     countryIndex = (countryIndex - 1 + filteredCountries.length) % filteredCountries.length;
+    emitCountryState();
   }
 }
 
@@ -626,6 +649,7 @@ function connectSocket() {
   socket.on("connect", () => {
     socketConnected = true;
     console.log("[socket] connected");
+    emitCountryState();
   });
 
   socket.on("disconnect", () => {
@@ -641,6 +665,29 @@ function connectSocket() {
       stfgov: Number(incoming.stfgov),
     });
     applyFilterAndResetIndex();
+  });
+
+  socket.on("request-country-state", () => {
+    emitCountryState();
+  });
+
+  socket.on("country-selection", (incoming) => {
+    if (filteredCountries.length === 0 || !incoming) return;
+
+    if (typeof incoming.index === "number" && Number.isFinite(incoming.index)) {
+      const len = filteredCountries.length;
+      countryIndex = ((Math.floor(incoming.index) % len) + len) % len;
+      emitCountryState();
+      return;
+    }
+
+    if (typeof incoming.country === "string") {
+      const selectedIndex = filteredCountries.findIndex((country) => country.country === incoming.country);
+      if (selectedIndex >= 0) {
+        countryIndex = selectedIndex;
+        emitCountryState();
+      }
+    }
   });
 }
 
