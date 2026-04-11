@@ -53,8 +53,10 @@ class Node {
     return this.closest;
   }
 
-  render(allYears) {
+  render(allYears, options = {}) {
     if (!this.closest || this.closest.year === null) return;
+
+    const isHighlighted = Boolean(options.highlighted) || this.country === highlightedCountryName;
 
     push();
     translate(this.pos.x, this.pos.y);
@@ -105,17 +107,22 @@ class Node {
       "red", // stfdem
     ];
 
-    //fill(255);
+    if (isHighlighted) {
+      fill(242, 208, 107, 18);
+      noStroke();
+      rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
+    }
+
     noFill();
-    stroke(255);
-    strokeWeight(1);
+    stroke(isHighlighted ? color(242, 208, 107) : 255);
+    strokeWeight(isHighlighted ? 2 : 1);
 
     let corner = 20;
 
     rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
 
     // Draw white background for years that have data
-    fill(255);
+    fill(isHighlighted ? color(255, 244, 191) : 255);
     noStroke();
     for (let i = 0; i < allYears.length; i++) {
       const year = allYears[i];
@@ -175,7 +182,7 @@ class Node {
       }
     }
 
-    fill(255);
+    fill(isHighlighted ? color(255, 244, 191) : 255);
     textAlign(CENTER);
     textSize(10);
     text(this.country, -25, 52.5);

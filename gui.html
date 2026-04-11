@@ -2,53 +2,62 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Controller</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <link rel="stylesheet" type="text/css" href="gui.css" />
   </head>
   <body>
-    <div id="status">disconnected</div>
+    <main class="controller-shell">
+      <header class="controller-header">
+        <div>
+          <p class="eyebrow">Controller</p>
+          <h1>Shifting Democracies</h1>
+          <p class="subtitle">Switch the country in view and tune the three live parameters.</p>
+        </div>
 
-    <div>
-      stfeco: <input type="range" id="stfeco" min="0" max="10" step="1" value="5" />
-      <span id="stfeco-val">5</span>
-    </div>
+        <div id="status" class="status-pill disconnected">disconnected</div>
+      </header>
 
-    <div>
-      stflife: <input type="range" id="stflife" min="0" max="10" step="1" value="5" />
-      <span id="stflife-val">5</span>
-    </div>
+      <section class="country-panel" aria-label="Country navigation">
+        <button class="nav-button" id="prev-country" type="button" aria-label="Previous country">&#8249;</button>
 
-    <div>
-      stfgov: <input type="range" id="stfgov" min="0" max="10" step="1" value="5" />
-      <span id="stfgov-val">5</span>
-    </div>
+        <div class="country-display" id="country-display">
+          <span class="country-label">Country in view</span>
+          <div class="country-name" id="country-name">Waiting for sketch...</div>
+          <div class="country-meta" id="country-meta">0 / 0</div>
+        </div>
 
-    <script>
-      const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-      const SERVER_URL = isLocal ? "http://localhost:8080" : window.location.origin;
-      const socket = io(SERVER_URL);
+        <button class="nav-button" id="next-country" type="button" aria-label="Next country">&#8250;</button>
+      </section>
 
-      socket.on("connect", () => (document.getElementById("status").textContent = "connected"));
-      socket.on("disconnect", () => (document.getElementById("status").textContent = "disconnected"));
+      <section class="sliders" aria-label="Parameter controls">
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="stfeco">stfeco</label>
+            <span id="stfeco-val">5</span>
+          </div>
+          <input type="range" id="stfeco" min="0" max="10" step="1" value="5" />
+        </div>
 
-      const params = { stfeco: 5, stflife: 5, stfgov: 5 };
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="stflife">stflife</label>
+            <span id="stflife-val">5</span>
+          </div>
+          <input type="range" id="stflife" min="0" max="10" step="1" value="5" />
+        </div>
 
-      ["stfeco", "stflife", "stfgov"].forEach((key) => {
-        document.getElementById(key).addEventListener("input", function () {
-          document.getElementById(key + "-val").textContent = this.value;
-          params[key] = Number(this.value);
-          socket.emit("params", params);
-        });
-      });
+        <div class="slider-row">
+          <div class="slider-head">
+            <label for="stfgov">stfgov</label>
+            <span id="stfgov-val">5</span>
+          </div>
+          <input type="range" id="stfgov" min="0" max="10" step="1" value="5" />
+        </div>
+      </section>
+    </main>
 
-      socket.on("params", (incoming) => {
-        Object.assign(params, incoming);
-        ["stfeco", "stflife", "stfgov"].forEach((key) => {
-          document.getElementById(key).value = params[key];
-          document.getElementById(key + "-val").textContent = params[key];
-        });
-      });
-    </script>
+    <script src="gui.js"></script>
   </body>
 </html>
