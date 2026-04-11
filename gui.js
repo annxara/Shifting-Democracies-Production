@@ -102,6 +102,20 @@ function emitCountrySelection(direction) {
   });
 }
 
+function handleCountryKeydown(event) {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+    return;
+  }
+
+  const target = event.target;
+  if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+    return;
+  }
+
+  event.preventDefault();
+  emitCountrySelection(event.key === "ArrowLeft" ? "prev" : "next");
+}
+
 Object.keys(params).forEach((key) => {
   const slider = document.getElementById(key);
 
@@ -114,6 +128,8 @@ Object.keys(params).forEach((key) => {
 
 prevCountryButton.addEventListener("click", () => emitCountrySelection("prev"));
 nextCountryButton.addEventListener("click", () => emitCountrySelection("next"));
+
+window.addEventListener("keydown", handleCountryKeydown);
 
 socket.on("connect", () => {
   setConnectionStatus(true);
