@@ -16,6 +16,8 @@ let flowerCloudKey = "";
 let randomPhaseStartsAt = 0;
 let clusterAnimationStartsAt = 0;
 const ROTATE_CANVAS_90 = true;
+const CLUSTER_DELAY_MS = 2000;
+const CLUSTER_MOVE_DURATION_MS = 4200;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -152,7 +154,7 @@ function drawTree(latest) {
   if (flowerCloud.length === 0) {
     flowerCloud = buildMemoryField(latest);
     randomPhaseStartsAt = millis();
-    clusterAnimationStartsAt = randomPhaseStartsAt + 2000;
+    clusterAnimationStartsAt = randomPhaseStartsAt + CLUSTER_DELAY_MS;
   }
 
   updateAndDrawFlowers();
@@ -184,10 +186,14 @@ function buildMemoryField(latest) {
     for (let n = 0; n < count; n++) {
       const size = flowerSize;
       const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, clusterRadius);
+      const randomStartX = random(bounds.minX, bounds.maxX);
+      const randomStartY = random(bounds.minY, bounds.maxY);
 
       flowers.push({
-        x: random(0, width),
-        y: random(0, height),
+        x: randomStartX,
+        y: randomStartY,
+        sx: randomStartX,
+        sy: randomStartY,
         tx: target.x,
         ty: target.y,
         ax: anchor.x,
@@ -341,28 +347,32 @@ function resolveTargetOverlaps(flowers, bounds) {
 
 function updateAndDrawFlowers() {
   // Show random start positions first, then move toward clusters.
-  const shouldStartClustering = millis() >= clusterAnimationStartsAt;
+  const now = millis();
+  const shouldStartClustering = now >= clusterAnimationStartsAt;
+  const moveProgress = constrain((now - clusterAnimationStartsAt) / CLUSTER_MOVE_DURATION_MS, 0, 1);
+  const easedMoveProgress = easeInOutCubic(moveProgress);
 
   // Draw smaller flowers first so bigger ones sit visually on top.
   flowerCloud.sort((a, b) => a.size - b.size);
 
   for (let f of flowerCloud) {
     if (shouldStartClustering && !f.settled) {
-      const dx = f.tx - f.x;
-      const dy = f.ty - f.y;
+      f.x = lerp(f.sx, f.tx, easedMoveProgress);
+      f.y = lerp(f.sy, f.ty, easedMoveProgress);
 
-      f.x += dx * 0.08;
-      f.y += dy * 0.08;
-
-      if (Math.abs(dx) < 0.6 && Math.abs(dy) < 0.6) {
-        f.x = f.tx;
-        f.y = f.ty;
+      if (moveProgress >= 1) {
         f.settled = true;
       }
     }
 
     drawSingleFlower(f);
   }
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function drawSingleFlower(f) {
