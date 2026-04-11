@@ -143,14 +143,21 @@ function buildMemoryField(latest) {
     maxY: height - 160,
   };
 
+  // One cluster center per color so same-color flowers stay together.
+  const clusterCenters = [];
+  for (let i = 0; i < indicatorConfig.length; i++) {
+    clusterCenters.push(pickGardenPosition(flowers, 80, bounds));
+  }
+
   for (let i = 0; i < indicatorConfig.length; i++) {
     const conf = indicatorConfig[i];
     const count = getFlowerCount(latest, conf.key);
+    const cluster = clusterCenters[i];
 
-    // Use more flowers for a rich field look.
-    for (let n = 0; n < count * 3; n++) {
-      const size = random(28, 72);
-      const target = pickGardenPosition(flowers, size, bounds);
+    // One flower per rounded score point (0..10), same mapping as before.
+    for (let n = 0; n < count; n++) {
+      const size = 20;
+      const target = pickGardenPositionNearCluster(flowers, size, bounds, cluster.x, cluster.y, 95);
 
       flowers.push({
         x: centerX + random(-20, 20),
@@ -167,6 +174,35 @@ function buildMemoryField(latest) {
   }
 
   return flowers;
+}
+
+function pickGardenPositionNearCluster(existingFlowers, size, bounds, cx, cy, radius) {
+  // Try placing near the given cluster center first.
+  const margin = size * 0.48;
+  const minX = bounds.minX + margin;
+  const maxX = bounds.maxX - margin;
+  const minY = bounds.minY + margin;
+  const maxY = bounds.maxY - margin;
+  const maxAttempts = 300;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const a = random(TWO_PI);
+    const r = radius * sqrt(random());
+    const x = constrain(cx + cos(a) * r, minX, maxX);
+    const y = constrain(cy + sin(a) * r, minY, maxY);
+
+    const overlaps = existingFlowers.some((f) => {
+      const required = (size + f.size) * 0.42;
+      return dist(x, y, f.tx, f.ty) < required;
+    });
+
+    if (!overlaps) {
+      return { x, y };
+    }
+  }
+
+  // If local area is crowded, fall back to global non-overlap placement.
+  return pickGardenPosition(existingFlowers, size, bounds);
 }
 
 function pickGardenPosition(existingFlowers, size, bounds) {
