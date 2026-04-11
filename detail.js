@@ -182,7 +182,7 @@ function buildMemoryField(latest) {
     minX: 70,
     maxX: width - 70,
     minY: HEADER_BLOCK_HEIGHT + 34,
-    maxY: height - LEGEND_BLOCK_HEIGHT - 26,
+    maxY: height - LEGEND_BLOCK_HEIGHT - 42,
   };
 
   // Build evenly spaced anchors for all indicators inside the flower area.
@@ -435,44 +435,45 @@ function drawLegend(latest) {
   const vDemIndicators = indicatorConfig.filter((item) => item.key.startsWith("v2x_"));
   const essIndicators = indicatorConfig.filter((item) => item.key.startsWith("stf"));
 
-  const legendTop = height - LEGEND_BLOCK_HEIGHT + 16;
   const panelX = 24;
   const panelY = height - LEGEND_BLOCK_HEIGHT;
   const panelW = width - 48;
-  const panelH = LEGEND_BLOCK_HEIGHT - 18;
+  const panelH = LEGEND_BLOCK_HEIGHT;
   const startX = panelX + 18;
   const contentWidth = panelW - 36;
   const columnWidth = contentWidth / 2;
-  const rowHeight = 52;
+  const titlesY = panelY + 28;
+  const rowsStartY = panelY + 70;
+  const rowHeight = 48;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#141b2ccc", "#2b3448");
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
 
   stroke("#2f3850");
   strokeWeight(1);
-  line(startX + columnWidth - 12, legendTop - 6, startX + columnWidth - 12, panelY + panelH - 14);
+  line(startX + columnWidth - 12, panelY + 16, startX + columnWidth - 12, panelY + panelH - 16);
 
   textAlign(LEFT, CENTER);
   noStroke();
 
   fill("#f1f5ff");
   textStyle(BOLD);
-  textSize(17);
-  text("V-Dem Values", startX, legendTop - 26);
-  text("ESS Values", startX + columnWidth, legendTop - 26);
+  textSize(18);
+  text("V-Dem Values", startX, titlesY);
+  text("ESS Values", startX + columnWidth, titlesY);
   textStyle(NORMAL);
 
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
 
   for (let row = 0; row < rows; row++) {
-    drawLegendRow(vDemIndicators[row], startX, legendTop, row, rowHeight, latest);
-    drawLegendRow(essIndicators[row], startX + columnWidth, legendTop, row, rowHeight, latest);
+    drawLegendRow(vDemIndicators[row], startX, rowsStartY, row, rowHeight, latest);
+    drawLegendRow(essIndicators[row], startX + columnWidth, rowsStartY, row, rowHeight, latest);
   }
 }
 
-function drawLegendRow(configItem, baseX, legendTop, row, rowHeight, latest) {
+function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   if (!configItem) return;
 
-  const y = legendTop + row * rowHeight;
+  const y = rowsStartY + row * rowHeight;
   const index = indicatorConfig.findIndex((item) => item.key === configItem.key);
   const flowerCount = getFlowerCount(latest, configItem.key);
 
