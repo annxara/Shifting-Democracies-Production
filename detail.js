@@ -20,6 +20,8 @@ const CLUSTER_DELAY_MS = 2000;
 const CLUSTER_MOVE_DURATION_MS = 4200;
 const HEADER_BLOCK_HEIGHT = 122;
 const LEGEND_BLOCK_HEIGHT = 258;
+const LEGEND_MARGIN = 24;
+const FLOWER_TO_LEGEND_GAP = 60;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -182,7 +184,7 @@ function buildMemoryField(latest) {
     minX: 70,
     maxX: width - 70,
     minY: HEADER_BLOCK_HEIGHT + 34,
-    maxY: height - LEGEND_BLOCK_HEIGHT - 60,
+    maxY: height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN - FLOWER_TO_LEGEND_GAP,
   };
 
   // Build evenly spaced anchors for all indicators inside the flower area.
@@ -436,8 +438,9 @@ function drawLegend(latest) {
   const essIndicators = indicatorConfig.filter((item) => item.key.startsWith("stf"));
 
   const panelX = 24;
-  const panelY = height - LEGEND_BLOCK_HEIGHT;
-  const panelW = width + 48;
+
+  const panelY = height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN;
+  const panelW = width - 48;
   const panelH = LEGEND_BLOCK_HEIGHT;
   const startX = panelX + 18;
   const contentWidth = panelW - 36;
