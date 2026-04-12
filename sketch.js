@@ -28,7 +28,7 @@ const ALL_YEARS = [
 // stflife: satisfaction with life (0-10)
 // stfgov: satisfaction with government (0-10)
 const params = {
-  stfeco: 5,  // Default: middle value
+  stfeco: 5, // Default: middle value
   stflife: 5,
   stfgov: 5,
 };
@@ -142,79 +142,104 @@ function publishCountryState() {
   });
 }
 
+// Draw the legend box in the bottom right corner explaining the visualization elements
 function drawLegend() {
-  const legendX = width - 460;
-  const legendY = height - 210;
-  const legendW = 240;
-  const legendH = 165;
+  const legendX = width - 470;
+  const legendY = height - 165;
+  const legendW = 300;
+  const legendH = 160;
 
   // Background box
   fill(30);
-  stroke(150);
-  strokeWeight(2);
-  rect(legendX, legendY, legendW, legendH, 10);
+  stroke(255);
+  strokeWeight(1);
+  rect(legendX, legendY, legendW, legendH, 15);
 
   // Title
   fill(255);
+  noStroke();
   textAlign(LEFT);
   textSize(13);
   textStyle(BOLD);
-  text("Legende", legendX + 8, legendY + 13);
+  text("Legende", legendX + 123, legendY + 15);
 
   // Example rectangle with divisions and colors
-  const exampleX = legendX + 8;
-  const exampleY = legendY + 18;
-  const exampleW = 175;
-  const exampleH = 20;
-  const sectionW = exampleW / 5; // Show 5 sections as example
+  const exampleX = legendX + 10;
+  const exampleY = legendY + 25;
+  const exampleW = 280;
+  const exampleH = 30;
+  const sectionW = exampleW / 11; // Show 11 sections as example
 
-  // Draw sections
-  fill(170); // Missing year - gray
-  rect(exampleX, exampleY, sectionW, exampleH, 5, 0, 0, 5);
+  // Draw all 11 sections
+  for (let i = 0; i < 11; i++) {
+    const x = exampleX + i * sectionW;
 
-  fill(255); // Matching - white
-  rect(exampleX + sectionW, exampleY, sectionW, exampleH);
+    // Alternate between different colors for visual variety
+    if (i === 0 || i === 10 || i === 1 || i === 7) {
+      fill(170); // End sections - gray (missing)
+    } else if (i === 5) {
+      fill(255, 255, 150, 255); // Middle - yellow (matching highlight)
+    } else if (i === 8) {
+      fill(255, 200, 150, 255); // Middle - lighter orange (matching highlight)
+    } else {
+      fill(255); // Middle sections - white (matching)
+    }
 
-  fill(255); // Matching - white
-  rect(exampleX + sectionW * 2, exampleY, sectionW, exampleH);
+    // Draw with rounded corners on edges
+    if (i === 0) {
+      rect(x, exampleY, sectionW, exampleH, 5, 0, 0, 5);
+    } else if (i === 10) {
+      rect(x, exampleY, sectionW, exampleH, 0, 5, 5, 0);
+    } else {
+      rect(x, exampleY, sectionW, exampleH);
+    }
+  }
 
-  fill(255, 255, 150, 255); // Matching highlight - yellow
-  rect(exampleX + sectionW * 3, exampleY, sectionW, exampleH);
-
-  fill(170); // Missing year - gray
-  rect(exampleX + sectionW * 4, exampleY, sectionW, exampleH, 0, 5, 5, 0);
-
-  // Draw sample data line across sections
-  stroke(255, 100, 100);
-  strokeWeight(1);
-  line(
-    exampleX + sectionW * 0.5,
-    exampleY + 15,
-    exampleX + sectionW * 4.5,
-    exampleY + 5,
-  );
-
-  // Draw dividers
+  // Draw dividers between all sections
   stroke(0);
   strokeWeight(0.5);
-  for (let i = 1; i < 5; i++) {
+  for (let i = 1; i < 11; i++) {
     line(
-      exampleX + sectionW * i,
+      exampleX + i * sectionW,
       exampleY,
-      exampleX + sectionW * i,
+      exampleX + i * sectionW,
       exampleY + exampleH,
     );
   }
 
-  // Legend text
+  // Draw sample data line across sections
+  // stroke(255, 100, 100);
+  // strokeWeight(1);
+  // line(
+  //   exampleX + sectionW * 0.5,
+  //   exampleY + 10,
+  //   exampleX + sectionW * 10.5,
+  //   exampleY + 10,
+  // );
+
+  // Legend text (split into 2 rows)
   fill(200);
-  textSize(6);
+  textSize(9);
   textStyle(NORMAL);
-  text(
-    "1 Block = Year |Yellow = Matching Params | Gray = Missing ",
-    legendX + 8,
-    exampleY + exampleH + 10,
-  );
+  text("1 Block = 1 Year ", legendX + 10, exampleY + exampleH + 11);
+
+  // Gray rectangle for missing data
+  fill(170);
+  rect(legendX + 125, exampleY + exampleH + 3, 12, 10, 2);
+  fill(200);
+  text("= Missing ESS Data", legendX + 140, exampleY + exampleH + 11);
+
+  // Yellow rectangle for exact match
+  fill(255, 255, 150, 255);
+  rect(legendX + 10, exampleY + exampleH + 15, 12, 10, 2);
+  fill(200);
+  text("= exact Match", legendX + 25, exampleY + exampleH + 23);
+
+  // Orange rectangle for closest year
+  fill(255, 200, 150, 255);
+  rect(legendX + 125, exampleY + exampleH + 15, 12, 10, 2);
+  fill(200);
+  text("= closest year to Parameters", legendX + 140, exampleY + exampleH + 23);
 
   // Draw colored circles for data dimensions
   const vdemLabels = [
@@ -234,12 +259,15 @@ function drawLegend() {
     "red",
   ];
 
-  const circleRadius = 3;
+  const circleRadius = 4;
   const circleSpacing = 18;
+  const columnSpacing = 115; // Space between columns
 
   for (let i = 0; i < vdemLabels.length; i++) {
-    const circleX = legendX + 8;
-    const circleY = legendY + 8 + exampleH + 30 + i * circleSpacing;
+    const column = i % 2;
+    const row = Math.floor(i / 2);
+    const circleX = legendX + 15 + column * columnSpacing;
+    const circleY = legendY + 35 + exampleH + 30 + row * circleSpacing;
 
     // Draw circle
     fill(vdemColors[i]);
