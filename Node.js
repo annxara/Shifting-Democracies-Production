@@ -258,7 +258,7 @@ class Node {
         this.yearMatchesParams(yearData, params)
       ) {
         const x = startX + i * sectionWidth;
-        fill("#FFD947");
+        fill("#FFECA0");
 
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
