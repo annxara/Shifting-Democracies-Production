@@ -9,13 +9,13 @@
 class Node {
   // Constructor - Initialize a country node
   constructor(country, years) {
-    this.country = country;              // Country name
-    this.years = years;                  // Array of year data: {year, v2x_polyarchy, stfeco, ...}
-    this.closest = null;                 // Closest matching year data based on params
-    this.pos = createVector(random(width), random(height));  // Position on canvas
-    this.currentOffset = 0;              // Current animated horizontal offset
-    this.targetOffset = 0;               // Target offset to animate towards
-    this.easeSpeed = 0.1;                // Easing speed (higher = faster animation)
+    this.country = country; // Country name
+    this.years = years; // Array of year data: {year, v2x_polyarchy, stfeco, ...}
+    this.closest = null; // Closest matching year data based on params
+    this.pos = createVector(random(width), random(height)); // Position on canvas
+    this.currentOffset = 0; // Current animated horizontal offset
+    this.targetOffset = 0; // Target offset to animate towards
+    this.easeSpeed = 0.1; // Easing speed (higher = faster animation)
   }
 
   // Normalize value to 0-1 scale for consistent rendering across different metrics
@@ -32,7 +32,7 @@ class Node {
 
   // Find year that exactly matches the filter parameters
   findMatchingYear(params) {
-    const tolerance = 0;  // Exact match only (no tolerance)
+    const tolerance = 0; // Exact match only (no tolerance)
 
     const matchedDetails = this.years.filter((details) => {
       if (details.year === 2025) return false;
@@ -188,12 +188,12 @@ class Node {
       "stfdem",
     ];
     const vdemColors = [
-      "orange", // v2x_polyarchy
-      "blue", // v2x_libdem
-      "cornflowerblue", // v2x_egaldem
-      "green", // v2x_delibdem
-      "violet", // v2x_partipdem
-      "red", // stfdem
+      "#00D9FF", // v2x_polyarchy - bright cyan
+      "#4B0082", // v2x_libdem - indigo (deep)
+      "#00B4A6", // v2x_egaldem - teal
+      "#8B3DFF", // v2x_delibdem - bright purple
+      "#1E90FF", // v2x_partipdem - dodger blue
+      "#FF00F2", // stfdem - magenta
     ];
 
     //fill(255);

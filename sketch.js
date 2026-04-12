@@ -161,7 +161,7 @@ function drawLegend() {
   textAlign(LEFT);
   textSize(13);
   textStyle(BOLD);
-  text("Legende", legendX + 123, legendY + 15);
+  text("Legende", legendX + 123, legendY + 17);
 
   // Example rectangle with divisions and colors
   const exampleX = legendX + 10;
@@ -218,28 +218,32 @@ function drawLegend() {
   // );
 
   // Legend text (split into 2 rows)
-  fill(200);
+  fill(255);
   textSize(9);
   textStyle(NORMAL);
-  text("1 Block = 1 Year ", legendX + 10, exampleY + exampleH + 11);
+  text("1 Block = 1 Year ", legendX + 10, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
   fill(170);
-  rect(legendX + 125, exampleY + exampleH + 3, 12, 10, 2);
-  fill(200);
-  text("= Missing ESS Data", legendX + 140, exampleY + exampleH + 11);
+  rect(legendX + 125, exampleY + 5 + exampleH + 3, 12, 10, 2);
+  fill(255);
+  text("= Missing ESS Data", legendX + 140, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
   fill(255, 255, 150, 255);
-  rect(legendX + 10, exampleY + exampleH + 15, 12, 10, 2);
-  fill(200);
-  text("= exact Match", legendX + 25, exampleY + exampleH + 23);
+  rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  fill(255);
+  text("= exact Match", legendX + 25, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
   fill(255, 200, 150, 255);
-  rect(legendX + 125, exampleY + exampleH + 15, 12, 10, 2);
-  fill(200);
-  text("= closest year to Parameters", legendX + 140, exampleY + exampleH + 23);
+  rect(legendX + 125, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  fill(255);
+  text(
+    "= closest year to Parameters",
+    legendX + 140,
+    exampleY + 5 + exampleH + 23,
+  );
 
   // Draw colored circles for data dimensions
   const vdemLabels = [
@@ -251,12 +255,12 @@ function drawLegend() {
     "stfdem",
   ];
   const vdemColors = [
-    "orange",
-    "blue",
-    "cornflowerblue",
-    "green",
-    "violet",
-    "red",
+    "#00D9FF", // v2x_polyarchy - bright cyan
+    "#4B0082", // v2x_libdem - indigo (deep)
+    "#00B4A6", // v2x_egaldem - teal
+    "#8B3DFF", // v2x_delibdem - bright purple
+    "#1E90FF", // v2x_partipdem - dodger blue
+    "#FF00F2", // stfdem - magenta
   ];
 
   const circleRadius = 4;
@@ -267,7 +271,7 @@ function drawLegend() {
     const column = i % 2;
     const row = Math.floor(i / 2);
     const circleX = legendX + 15 + column * columnSpacing;
-    const circleY = legendY + 35 + exampleH + 30 + row * circleSpacing;
+    const circleY = legendY + 45 + exampleH + 30 + row * circleSpacing;
 
     // Draw circle
     fill(vdemColors[i]);
@@ -275,11 +279,11 @@ function drawLegend() {
     circle(circleX, circleY, circleRadius * 2);
 
     // Draw label
-    fill(150);
+    fill(255);
     textAlign(LEFT);
-    textSize(5);
+    textSize(9);
     textStyle(NORMAL);
-    text(vdemLabels[i], circleX + 6, circleY + 2);
+    text(vdemLabels[i], circleX + 8, circleY + 2);
   }
 }
 
