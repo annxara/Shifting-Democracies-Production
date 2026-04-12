@@ -247,12 +247,12 @@ function drawLegend() {
 
   // Draw colored circles for data dimensions
   const vdemLabels = [
-    "v2x_polyarchy",
-    "v2x_libdem",
-    "v2x_egaldem",
-    "v2x_delibdem",
-    "v2x_partipdem",
-    "stfdem",
+    "Polyarchy",
+    "Liberal Democracy",
+    "Egalitarian Democracy",
+    "Deliberative Democracy",
+    "Participatory Democracy",
+    "Satisfaction with Democracy",
   ];
   const vdemColors = [
     "#00D9FF", // v2x_polyarchy - bright cyan
