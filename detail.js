@@ -11,6 +11,8 @@ let countryData = [];
 let filteredCountries = [];
 let countryIndex = 0;
 let flowerImages = [];
+let interpretationCsvLines = [];
+let interpretationLookup = new Map();
 let flowerCloud = [];
 let flowerCloudKey = "";
 let randomPhaseStartsAt = 0;
@@ -19,9 +21,12 @@ const ROTATE_CANVAS_90 = true;
 const CLUSTER_DELAY_MS = 2000;
 const CLUSTER_MOVE_DURATION_MS = 4200;
 const HEADER_BLOCK_HEIGHT = 122;
+const INTERPRETATION_BLOCK_HEIGHT = 126;
+const INTERPRETATION_MARGIN_TOP = 12;
 const LEGEND_BLOCK_HEIGHT = 258;
 const LEGEND_MARGIN = 24;
 const FLOWER_TO_LEGEND_GAP = 60;
+const BINARY_HIGH_THRESHOLD = 0.5;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -84,6 +89,7 @@ const indicatorConfig = [
 function preload() {
   // Load the data file and the flower pictures first.
   countryData = loadJSON("ess_vdem_country_year_variables 2.json");
+  interpretationCsvLines = loadStrings("vdem_48_kombinationen.csv");
 
   for (let i = 0; i < indicatorConfig.length; i++) {
     flowerImages.push(loadImage(indicatorConfig[i].image));
@@ -121,6 +127,7 @@ function setup() {
 
   // Make the data ready to use.
   countryData = toCountryArray(countryData);
+  interpretationLookup = buildInterpretationLookup(interpretationCsvLines);
 
   // Make all flower pictures the same size.
   for (let i = 0; i < flowerImages.length; i++) {
@@ -167,6 +174,7 @@ function draw() {
   }
 
   drawHeader(country, latest);
+  drawInterpretationPanel(latest);
   drawTree(latest);
   drawLegend(latest);
   //drawFooter();
@@ -225,7 +233,11 @@ function buildMemoryField(latest) {
   const bounds = {
     minX: 70,
     maxX: width - 70,
-    minY: HEADER_BLOCK_HEIGHT + 34,
+    minY:
+      HEADER_BLOCK_HEIGHT +
+      INTERPRETATION_MARGIN_TOP +
+      INTERPRETATION_BLOCK_HEIGHT +
+      28,
     maxY: height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN - FLOWER_TO_LEGEND_GAP,
   };
 
@@ -558,6 +570,173 @@ function drawLegend(latest) {
       latest,
     );
   }
+}
+
+function parseSemicolonCsvLine(line) {
+  const result = [];
+  let value = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        value += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (ch === ";" && !inQuotes) {
+      result.push(value.trim());
+      value = "";
+      continue;
+    }
+
+    value += ch;
+  }
+
+  result.push(value.trim());
+  return result;
+}
+
+function buildInterpretationLookup(lines) {
+  const lookup = new Map();
+  if (!Array.isArray(lines)) return lookup;
+
+  for (const rawLine of lines) {
+    if (!rawLine || !rawLine.includes(";")) continue;
+
+    const cols = parseSemicolonCsvLine(rawLine);
+    if (cols.length < 7) continue;
+
+    const edi = cols[0];
+    const liberal = cols[1];
+    const participatory = cols[2];
+    const egalitarian = cols[3];
+    const deliberative = cols[4];
+
+    if (!["N", "M", "H"].includes(edi)) continue;
+    if (!["N", "H"].includes(liberal)) continue;
+    if (!["N", "H"].includes(participatory)) continue;
+    if (!["N", "H"].includes(egalitarian)) continue;
+    if (!["N", "H"].includes(deliberative)) continue;
+
+    const regimeType = cols[5] || "Unbekannter Regimetyp";
+    const interpretation = cols[6] || "Keine Interpretation vorhanden.";
+    const key = [edi, liberal, participatory, egalitarian, deliberative].join("|");
+
+    lookup.set(key, {
+      regimeType,
+      interpretation,
+    });
+  }
+
+  return lookup;
+}
+
+function classifyEdi(value) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return "N";
+  if (numericValue < 0.4) return "N";
+  if (numericValue <= 0.6) return "M";
+  return "H";
+}
+
+function classifyBinary(value) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return "N";
+  return numericValue >= BINARY_HIGH_THRESHOLD ? "H" : "N";
+}
+
+function getRegimeInterpretation(latest) {
+  const scores = {
+    edi: classifyEdi(latest.v2x_polyarchy),
+    liberal: classifyBinary(latest.v2x_libdem),
+    participatory: classifyBinary(latest.v2x_partipdem),
+    egalitarian: classifyBinary(latest.v2x_egaldem),
+    deliberative: classifyBinary(latest.v2x_delibdem),
+  };
+
+  const key = [
+    scores.edi,
+    scores.liberal,
+    scores.participatory,
+    scores.egalitarian,
+    scores.deliberative,
+  ].join("|");
+
+  const matched = interpretationLookup.get(key);
+
+  if (!matched) {
+    return {
+      key,
+      scores,
+      regimeType: "Keine passende Kategorie gefunden",
+      interpretation:
+        "Die Scores konnten keiner Zeile aus der 48-Kombinationen-Tabelle zugeordnet werden.",
+    };
+  }
+
+  return {
+    key,
+    scores,
+    regimeType: matched.regimeType,
+    interpretation: matched.interpretation,
+  };
+}
+
+function drawInterpretationPanel(latest) {
+  const result = getRegimeInterpretation(latest);
+  const panelX = 24;
+  const panelY = HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
+  const panelW = width - 48;
+  const panelH = INTERPRETATION_BLOCK_HEIGHT;
+  const profileText =
+    "Profil (EDI/L/P/E/D): " +
+    result.scores.edi +
+    "/" +
+    result.scores.liberal +
+    "/" +
+    result.scores.participatory +
+    "/" +
+    result.scores.egalitarian +
+    "/" +
+    result.scores.deliberative;
+
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
+
+  noStroke();
+  textAlign(LEFT, TOP);
+
+  fill("#f1f5ff");
+  textStyle(BOLD);
+  textSize(16);
+  text("Regime-Interpretation", panelX + 16, panelY + 14);
+
+  fill("#b9c2d8");
+  textStyle(NORMAL);
+  textSize(13);
+  text(profileText, panelX + 16, panelY + 38);
+
+  fill("#e8ecf8");
+  textStyle(BOLD);
+  textSize(14);
+  text(result.regimeType, panelX + 16, panelY + 58);
+
+  fill("#d4dbec");
+  textStyle(NORMAL);
+  textSize(13);
+  text(
+    result.interpretation,
+    panelX + 16,
+    panelY + 80,
+    panelW - 32,
+    panelH - 16,
+  );
 }
 
 function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
