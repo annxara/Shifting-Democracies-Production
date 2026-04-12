@@ -280,7 +280,7 @@ class Node {
           if (allYears[i] === closestYearValue) {
             const x = startX + i * sectionWidth;
             noStroke();
-            fill("#FFECA0"); // Light orange
+            fill("#FFFDD8"); // Light orange
 
             if (i === 0) {
               rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
