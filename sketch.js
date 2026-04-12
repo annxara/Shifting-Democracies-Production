@@ -178,9 +178,9 @@ function drawLegend() {
     if (i === 0 || i === 10 || i === 1 || i === 7) {
       fill(170); // End sections - gray (missing)
     } else if (i === 5) {
-      fill(255, 255, 150, 255); // Middle - yellow (matching highlight)
+      fill("#E8FA5F"); // Middle - yellow (matching highlight)
     } else if (i === 8) {
-      fill(255, 200, 150, 255); // Middle - lighter orange (matching highlight)
+      fill("#FFFECB"); // Middle - lighter orange (matching highlight)
     } else {
       fill(255); // Middle sections - white (matching)
     }
@@ -230,13 +230,13 @@ function drawLegend() {
   text("= Missing ESS Data", legendX + 140, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
-  fill(255, 255, 150, 255);
+  fill("#E8FA5F");
   rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   text("= exact Match", legendX + 25, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
-  fill(255, 200, 150, 255);
+  fill("#FFFECB");
   rect(legendX + 125, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   text(
