@@ -1,3 +1,6 @@
+/* Google Fonts: Open Sans */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
 html, body {
   margin: 0;
   padding: 0;
@@ -5,7 +8,7 @@ html, body {
   height: 100%;
   background: #0c0f17;
   color: #f7f7f7;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 body {

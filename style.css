@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+
 html, body {
   margin: 0;
   padding: 0;
@@ -7,12 +10,3 @@ html, body {
 canvas {
   display: block;
 }
-
-/* .lil-gui { 
-	--width: 800px;
-	--height: 1500px;
-	--name-width: 65%;
-	--background-color: #000;
-	--widget-color: #0af;
-	--padding: 2px;
-} */

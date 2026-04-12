@@ -39,17 +39,47 @@ const params = {
 
 // Each color belongs to one data variable.
 const indicatorConfig = [
-  { key: "v2x_libdem", label: "Liberal Democracy", image: "pictures/forgetmenot_blue.png" },
-  { key: "v2x_polyarchy", label: "Polyarchy", image: "pictures/forgetmenot_pink.png" },
-  { key: "v2x_partipdem", label: "Participatory Democracy", image: "pictures/forgetmenot_green.png" },
-  { key: "v2x_delibdem", label: "Deliberative Democracy", image: "pictures/forgetmenot_yellow.png" },
-  { key: "stfdem", label: "Satisfaction with Democracy", image: "pictures/forgetmenot_red.png" },
-  { key: "stfeco", label: "Satisfaction with Economy", image: "pictures/forgetmenot_babyblue.png" },
-  { key: "stflife", label: "Satisfaction with Life", image: "pictures/forgetmenot_magenta.png" },
-  { key: "stfgov", label: "Satisfaction with Government", image: "pictures/forgetmenot_grassgreen.png" },
+  {
+    key: "v2x_libdem",
+    label: "Liberal Democracy",
+    image: "pictures/forgetmenot_blue.png",
+  },
+  {
+    key: "v2x_polyarchy",
+    label: "Polyarchy",
+    image: "pictures/forgetmenot_pink.png",
+  },
+  {
+    key: "v2x_partipdem",
+    label: "Participatory Democracy",
+    image: "pictures/forgetmenot_green.png",
+  },
+  {
+    key: "v2x_delibdem",
+    label: "Deliberative Democracy",
+    image: "pictures/forgetmenot_yellow.png",
+  },
+  {
+    key: "stfdem",
+    label: "Satisfaction with Democracy",
+    image: "pictures/forgetmenot_red.png",
+  },
+  {
+    key: "stfeco",
+    label: "Satisfaction with Economy",
+    image: "pictures/forgetmenot_babyblue.png",
+  },
+  {
+    key: "stflife",
+    label: "Satisfaction with Life",
+    image: "pictures/forgetmenot_magenta.png",
+  },
+  {
+    key: "stfgov",
+    label: "Satisfaction with Government",
+    image: "pictures/forgetmenot_grassgreen.png",
+  },
 ];
-
-
 
 function preload() {
   // Load the data file and the flower pictures first.
@@ -66,7 +96,12 @@ function toCountryArray(rawData) {
   if (rawData && Array.isArray(rawData.data)) return rawData.data;
   if (rawData && typeof rawData === "object") {
     const values = Object.values(rawData);
-    if (values.length > 0 && values.every((v) => v && typeof v === "object" && "country" in v && "years" in v)) {
+    if (
+      values.length > 0 &&
+      values.every(
+        (v) => v && typeof v === "object" && "country" in v && "years" in v,
+      )
+    ) {
       return values;
     }
   }
@@ -176,9 +211,16 @@ function buildMemoryField(latest) {
   // Create flowers that start at random positions, then settle into clusters.
 
   const flowers = [];
-  const totalFlowerCount = indicatorConfig.reduce((sum, conf) => sum + getFlowerCount(latest, conf.key), 0);
+  const totalFlowerCount = indicatorConfig.reduce(
+    (sum, conf) => sum + getFlowerCount(latest, conf.key),
+    0,
+  );
   const flowerSize = getFlowerVisualSize(totalFlowerCount);
-  const clusterRadius = constrain(map(totalFlowerCount, 20, 80, 112, 90), 86, 116);
+  const clusterRadius = constrain(
+    map(totalFlowerCount, 20, 80, 112, 90),
+    86,
+    116,
+  );
 
   const bounds = {
     minX: 70,
@@ -198,7 +240,13 @@ function buildMemoryField(latest) {
     // One flower per rounded score point (0..10), same mapping as before.
     for (let n = 0; n < count; n++) {
       const size = flowerSize;
-      const target = pickGardenPositionNearAnchor(flowers, size, bounds, anchor, clusterRadius);
+      const target = pickGardenPositionNearAnchor(
+        flowers,
+        size,
+        bounds,
+        anchor,
+        clusterRadius,
+      );
       const randomStartX = random(bounds.minX, bounds.maxX);
       const randomStartY = random(bounds.minY, bounds.maxY);
 
@@ -257,7 +305,13 @@ function buildGridAnchors(anchorCount, bounds) {
   return anchors;
 }
 
-function pickGardenPositionNearAnchor(existingFlowers, size, bounds, anchor, clusterRadius) {
+function pickGardenPositionNearAnchor(
+  existingFlowers,
+  size,
+  bounds,
+  anchor,
+  clusterRadius,
+) {
   // Keep each variable near its own anchor and prevent overlaps.
   const margin = size * 0.48;
   const minX = bounds.minX + margin;
@@ -348,8 +402,16 @@ function resolveTargetOverlaps(flowers, bounds) {
     for (const f of flowers) {
       f.tx += (f.ax - f.tx) * 0.05;
       f.ty += (f.ay - f.ty) * 0.05;
-      f.tx = constrain(f.tx, bounds.minX + f.size * 0.5, bounds.maxX - f.size * 0.5);
-      f.ty = constrain(f.ty, bounds.minY + f.size * 0.5, bounds.maxY - f.size * 0.5);
+      f.tx = constrain(
+        f.tx,
+        bounds.minX + f.size * 0.5,
+        bounds.maxX - f.size * 0.5,
+      );
+      f.ty = constrain(
+        f.ty,
+        bounds.minY + f.size * 0.5,
+        bounds.maxY - f.size * 0.5,
+      );
     }
 
     if (!moved) {
@@ -362,7 +424,11 @@ function updateAndDrawFlowers() {
   // Show random start positions first, then move toward clusters.
   const now = millis();
   const shouldStartClustering = now >= clusterAnimationStartsAt;
-  const moveProgress = constrain((now - clusterAnimationStartsAt) / CLUSTER_MOVE_DURATION_MS, 0, 1);
+  const moveProgress = constrain(
+    (now - clusterAnimationStartsAt) / CLUSTER_MOVE_DURATION_MS,
+    0,
+    1,
+  );
   const easedMoveProgress = easeInOutCubic(moveProgress);
 
   // Draw smaller flowers first so bigger ones sit visually on top.
@@ -383,15 +449,17 @@ function updateAndDrawFlowers() {
 }
 
 function easeInOutCubic(t) {
-  return t < 0.5
-    ? 4 * t * t * t
-    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
 function drawSingleFlower(f) {
   // Draw one flower with a short grow-in animation at the start.
   const elapsedSinceRandomStart = millis() - randomPhaseStartsAt;
-  const growProgress = constrain((elapsedSinceRandomStart - f.growDelay) / f.growDuration, 0, 1);
+  const growProgress = constrain(
+    (elapsedSinceRandomStart - f.growDelay) / f.growDuration,
+    0,
+    1,
+  );
   const smoothGrow = growProgress * growProgress * (3 - 2 * growProgress);
   const drawSize = f.size * smoothGrow;
 
@@ -405,17 +473,10 @@ function drawSingleFlower(f) {
 
   noTint();
 
-  image(
-    flowerImages[f.flowerIndex],
-    0,
-    0,
-    drawSize,
-    drawSize
-  );
+  image(flowerImages[f.flowerIndex], 0, 0, drawSize, drawSize);
 
   pop();
 }
-
 
 function getFlowerCount(latest, indicatorKey) {
   // Support two scales:
@@ -434,8 +495,12 @@ function getFlowerCount(latest, indicatorKey) {
 
 function drawLegend(latest) {
   // Show V-Dem indicators on the left and ESS indicators on the right.
-  const vDemIndicators = indicatorConfig.filter((item) => item.key.startsWith("v2x_"));
-  const essIndicators = indicatorConfig.filter((item) => item.key.startsWith("stf"));
+  const vDemIndicators = indicatorConfig.filter((item) =>
+    item.key.startsWith("v2x_"),
+  );
+  const essIndicators = indicatorConfig.filter((item) =>
+    item.key.startsWith("stf"),
+  );
 
   const panelX = 24;
 
@@ -453,7 +518,12 @@ function drawLegend(latest) {
 
   stroke("#2f3850");
   strokeWeight(1);
-  line(startX + columnWidth - 12, panelY + 16, startX + columnWidth - 12, panelY + panelH - 16);
+  line(
+    startX + columnWidth - 12,
+    panelY + 16,
+    startX + columnWidth - 12,
+    panelY + panelH - 16,
+  );
 
   textAlign(LEFT, CENTER);
   noStroke();
@@ -468,8 +538,22 @@ function drawLegend(latest) {
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
 
   for (let row = 0; row < rows; row++) {
-    drawLegendRow(vDemIndicators[row], startX, rowsStartY, row, rowHeight, latest);
-    drawLegendRow(essIndicators[row], startX + columnWidth, rowsStartY, row, rowHeight, latest);
+    drawLegendRow(
+      vDemIndicators[row],
+      startX,
+      rowsStartY,
+      row,
+      rowHeight,
+      latest,
+    );
+    drawLegendRow(
+      essIndicators[row],
+      startX + columnWidth,
+      rowsStartY,
+      row,
+      rowHeight,
+      latest,
+    );
   }
 }
 
@@ -477,7 +561,9 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   if (!configItem) return;
 
   const y = rowsStartY + row * rowHeight;
-  const index = indicatorConfig.findIndex((item) => item.key === configItem.key);
+  const index = indicatorConfig.findIndex(
+    (item) => item.key === configItem.key,
+  );
   const flowerCount = getFlowerCount(latest, configItem.key);
 
   // Draw one example flower.
@@ -534,12 +620,21 @@ function drawNoMatchState() {
   noStroke();
   textAlign(CENTER, CENTER);
   textSize(28);
-  text("Keine Laender entsprechen den aktuellen Parametern.", width / 2, height / 2 - 24);
+  text(
+    "Keine Laender entsprechen den aktuellen Parametern.",
+    width / 2,
+    height / 2 - 24,
+  );
 
   textSize(18);
   fill("#b8bcc8");
   text(
-    "stfeco: " + params.stfeco + " | stflife: " + params.stflife + " | stfgov: " + params.stfgov,
+    "stfeco: " +
+      params.stfeco +
+      " | stflife: " +
+      params.stflife +
+      " | stfgov: " +
+      params.stfgov,
     width / 2,
     height / 2 + 20,
   );
@@ -600,7 +695,9 @@ function applyFilterAndResetIndex() {
 
   // Keep only the countries that match the current settings.
   countryData = countries;
-  filteredCountries = countryData.filter((country) => findMatchingYear(country, params));
+  filteredCountries = countryData.filter((country) =>
+    findMatchingYear(country, params),
+  );
   countryIndex = 0;
   flowerCloud = [];
   flowerCloudKey = "";
@@ -637,7 +734,8 @@ function keyPressed() {
   }
 
   if (keyCode === LEFT_ARROW) {
-    countryIndex = (countryIndex - 1 + filteredCountries.length) % filteredCountries.length;
+    countryIndex =
+      (countryIndex - 1 + filteredCountries.length) % filteredCountries.length;
     emitCountryState();
   }
 }
@@ -682,7 +780,9 @@ function connectSocket() {
     }
 
     if (typeof incoming.country === "string") {
-      const selectedIndex = filteredCountries.findIndex((country) => country.country === incoming.country);
+      const selectedIndex = filteredCountries.findIndex(
+        (country) => country.country === incoming.country,
+      );
       if (selectedIndex >= 0) {
         countryIndex = selectedIndex;
         emitCountryState();
@@ -690,8 +790,6 @@ function connectSocket() {
     }
   });
 }
-
-
 
 /*function drawRecursiveTree(counts) {
   // Draw one white tree. More flowers = bigger tree and more branch levels.
@@ -771,7 +869,6 @@ function drawBranch(x, y, len, angle, depth, spread, counts, sideBalance, level,
   drawBranch(nx, ny, rightLen, angle + rightTurn, depth - 1, nextSpread, counts, sideBalance, level + 1, tips, desiredTips);
 }
 */
-
 
 /*function buildFlowerCloud(latest, tips) {
   // Place flowers only at branch ends.
