@@ -27,6 +27,9 @@ const LEGEND_BLOCK_HEIGHT = 258;
 const LEGEND_MARGIN = 24;
 const FLOWER_TO_LEGEND_GAP = 60;
 const BINARY_HIGH_THRESHOLD = 0.5;
+const FONT_SIZE_TITLE = 56;
+const FONT_SIZE_SECTION = 32;
+const FONT_SIZE_BODY = 24;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -194,11 +197,11 @@ function drawHeader(country, latest) {
   textAlign(LEFT, TOP);
   textStyle(BOLD);
 
-  textSize(43);
+  textSize(FONT_SIZE_TITLE);
   text(country.country, panelX + 22, panelY + 16);
 
   textStyle(NORMAL);
-  textSize(18);
+  textSize(FONT_SIZE_BODY);
   fill("#b6bfd4");
   text("Jahr: " + latest.year + " (neuester Wert)", panelX + 24, panelY + 70);
 }
@@ -545,7 +548,7 @@ function drawLegend(latest) {
 
   fill("#f1f5ff");
   textStyle(BOLD);
-  textSize(18);
+  textSize(FONT_SIZE_SECTION);
   text("V-Dem Values", startX, titlesY);
   text("ESS Values", startX + columnWidth, titlesY);
   textStyle(NORMAL);
@@ -701,12 +704,12 @@ function drawInterpretationPanel(latest) {
 
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(16);
+  textSize(FONT_SIZE_SECTION);
   text(result.regimeType, panelX + 16, panelY + 18);
 
   fill("#d4dbec");
   textStyle(NORMAL);
-  textSize(13);
+  textSize(FONT_SIZE_BODY);
   text(
     result.interpretation,
     panelX + 16,
@@ -731,13 +734,13 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   // Show label.
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(14);
+  textSize(FONT_SIZE_BODY);
   text(configItem.label, baseX + 34, y - 9);
 
   // Show real flower count currently rendered in the garden.
   fill("#98a1b7");
   textStyle(NORMAL);
-  textSize(13);
+  textSize(FONT_SIZE_BODY);
   text(String(flowerCount), baseX + 34, y + 10);
 }
 
@@ -746,7 +749,7 @@ function drawFooter() {
   fill("#a2a9bc");
   noStroke();
   textAlign(LEFT, BOTTOM);
-  textSize(16);
+  textSize(FONT_SIZE_BODY);
   text("<- / -> : Land wechseln", 34, height - 12);
 
   const statusText = socketConnected ? "Socket: verbunden" : "Socket: getrennt";
@@ -769,7 +772,7 @@ function drawLoadingState() {
   fill(255);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(24);
+  textSize(FONT_SIZE_SECTION);
   text("Daten werden geladen...", width / 2, height / 2);
 }
 
@@ -778,14 +781,14 @@ function drawNoMatchState() {
   fill(220);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(28);
+  textSize(FONT_SIZE_SECTION);
   text(
     "Keine Laender entsprechen den aktuellen Parametern.",
     width / 2,
     height / 2 - 24,
   );
 
-  textSize(18);
+  textSize(FONT_SIZE_BODY);
   fill("#b8bcc8");
   text(
     "stfeco: " +
