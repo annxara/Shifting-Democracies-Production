@@ -12,7 +12,6 @@ const ALL_YEARS = [
   2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2023,
 ];
 
-const gui = new lil.GUI();
 const params = {
   stfeco: 5,
   stflife: 5,
@@ -60,14 +59,6 @@ function setup() {
     );
   }
 
-  for (const key of Object.keys(params)) {
-    gui.add(params, key, 0, 10, 1).onChange(() => {
-      onParamsChange();
-      if (socket) {
-        socket.emit("params", { ...params });
-      }
-    });
-  }
   onParamsChange(); // Initialize closest years for all countries
 
   connectSocket();
