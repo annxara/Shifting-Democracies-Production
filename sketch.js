@@ -1,6 +1,16 @@
+// ============================================================================
+// SHIFTING DEMOCRACIES - MAIN SKETCH VISUALIZATION
+// ============================================================================
+// This is the main p5.js sketch that displays the data visualization.
+// It receives parameter updates from gui.html via Socket.io and renders
+// country data cards in a 3-column grid layout.
+// ============================================================================
+
+// Detect if running locally or on cloud deployment
 const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
 const SERVER_URL = isLocal ? "http://localhost:8080" : window.location.origin;
 
+// Socket.io connection for real-time parameter updates
 let socket;
 let data;
 let countries = [];
@@ -8,12 +18,17 @@ let filteredCountries = [];
 let countryIndex = 0;
 let highlightedCountryName = "";
 
+// Survey years available in the dataset
 const ALL_YEARS = [
   2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2023,
 ];
 
+// Current filter parameters (controlled by gui.html)
+// stfeco: satisfaction with economy (0-10)
+// stflife: satisfaction with life (0-10)
+// stfgov: satisfaction with government (0-10)
 const params = {
-  stfeco: 5,
+  stfeco: 5,  // Default: middle value
   stflife: 5,
   stfgov: 5,
 };

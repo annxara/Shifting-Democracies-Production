@@ -1,26 +1,38 @@
+// ============================================================================
+// NODE CLASS - Represents a single country with its data visualization
+// ============================================================================
+// Each country is rendered as a small card showing multiple indicators
+// across different years with animated offset based on how close it is to
+// the current filter parameters.
+// ============================================================================
+
 class Node {
+  // Constructor - Initialize a country node
   constructor(country, years) {
-    this.country = country;
-    this.years = years; // array of { year, v2x_polyarchy, ... }
-    this.closest = null;
-    this.pos = createVector(random(width), random(height));
-    this.yearDistances = {}; // keyed by year
-    this.currentOffset = 0; // Current animated offset
-    this.targetOffset = 0; // Target offset position
-    this.easeSpeed = 0.1; // Speed of easing (0-1, higher = faster)
+    this.country = country;              // Country name
+    this.years = years;                  // Array of year data: {year, v2x_polyarchy, stfeco, ...}
+    this.closest = null;                 // Closest matching year data based on params
+    this.pos = createVector(random(width), random(height));  // Position on canvas
+    this.currentOffset = 0;              // Current animated horizontal offset
+    this.targetOffset = 0;               // Target offset to animate towards
+    this.easeSpeed = 0.1;                // Easing speed (higher = faster animation)
   }
 
+  // Normalize value to 0-1 scale for consistent rendering across different metrics
+  // Some metrics (satisfaction) are on 0-10 scale, others (v2x_*) on 0-1 scale
   normalizeValue(key, value) {
     // Map different value systems to 0-1 scale
     if (key === "stfgov" || key === "stfdem") {
-      // stfgov and stfdem are on 0-10 scale, normalize to 0-1
+      // Satisfaction metrics: 0-10 → 0-1
       return value / 10;
     }
-    return value; // v2x_* variables already on 0-1 scale
+    // V-Dem indicators already 0-1
+    return value;
   }
 
+  // Find year that exactly matches the filter parameters
   findMatchingYear(params) {
-    const tolerance = 0;
+    const tolerance = 0;  // Exact match only (no tolerance)
 
     const matchedDetails = this.years.filter((details) => {
       if (details.year === 2025) return false;
@@ -50,6 +62,7 @@ class Node {
     };
     return this.closest;
   }
+  // Check if a specific year's data matches the filter parameters
   yearMatchesParams(yearData, params) {
     const tolerance = 0;
 
@@ -63,6 +76,7 @@ class Node {
     );
   }
 
+  // Check if a year has all satisfaction data available (for rendering stfdem line)
   hasSatisfactionData(yearData) {
     return (
       yearData &&
@@ -75,6 +89,8 @@ class Node {
     );
   }
 
+  // Find the year closest to current filter parameters
+  // Used for non-matching countries to show "nearest match"
   getClosestYearAndDifference(params) {
     // Find year with minimum distance to params
     let closestYear = null;
@@ -112,6 +128,9 @@ class Node {
     return { year: closestYear, avgDifference };
   }
 
+  // ==== MAIN RENDER FUNCTION ====
+  // Draws the country data card visualization
+  // Shows: year timeline, data indicators, and satisfaction metrics
   render(allYears, params, hasAnyMatch = true) {
     if (!this.closest || this.closest.year === null) return;
 

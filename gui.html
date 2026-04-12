@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Controller</title>
+    <!-- Socket.io for real-time communication -->
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <link rel="stylesheet" type="text/css" href="gui.css" />
     
@@ -13,7 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <!-- Main controller interface -->
     <main class="controller-shell">
+      <!-- Header with title and connection status -->
       <header class="controller-header">
         <div>
           <p class="eyebrow">Controller</p>
@@ -21,22 +24,29 @@
           <p class="subtitle">Switch the country in view and tune the three live parameters.</p>
         </div>
 
+        <!-- Connection status indicator -->
         <div id="status" class="status-pill disconnected">disconnected</div>
       </header>
 
+      <!-- Country navigation section -->
       <section class="country-panel" aria-label="Country navigation">
+        <!-- Previous button -->
         <button class="nav-button" id="prev-country" type="button" aria-label="Previous country">&#8249;</button>
 
+        <!-- Current country display -->
         <div class="country-display" id="country-display">
           <span class="country-label">Country in view</span>
           <div class="country-name" id="country-name">Waiting for sketch...</div>
           <div class="country-meta" id="country-meta">0 / 0</div>
         </div>
 
+        <!-- Next button -->
         <button class="nav-button" id="next-country" type="button" aria-label="Next country">&#8250;</button>
       </section>
 
+      <!-- Parameter slider controls -->
       <section class="sliders" aria-label="Parameter controls">
+        <!-- Satisfaction with Economy slider (0-10) -->
         <div class="slider-row">
           <div class="slider-head">
             <label for="stfeco">stfeco</label>
@@ -45,6 +55,7 @@
           <input type="range" id="stfeco" min="0" max="10" step="1" value="5" />
         </div>
 
+        <!-- Satisfaction with Life slider (0-10) -->
         <div class="slider-row">
           <div class="slider-head">
             <label for="stflife">stflife</label>
@@ -53,6 +64,7 @@
           <input type="range" id="stflife" min="0" max="10" step="1" value="5" />
         </div>
 
+        <!-- Satisfaction with Government slider (0-10) -->
         <div class="slider-row">
           <div class="slider-head">
             <label for="stfgov">stfgov</label>
@@ -63,6 +75,7 @@
       </section>
     </main>
 
+    <!-- Load controller logic -->
     <script src="gui.js"></script>
   </body>
 </html>
