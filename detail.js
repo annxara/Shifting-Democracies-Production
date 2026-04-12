@@ -215,6 +215,7 @@ function drawTree(latest) {
 
   updateAndDrawFlowers();
 }
+
 function buildMemoryField(latest) {
   // Create flowers that start at random positions, then settle into clusters.
 
@@ -271,7 +272,6 @@ function buildMemoryField(latest) {
         ty: target.y,
         ax: anchor.x,
         ay: anchor.y,
-
         flowerIndex: i,
         size,
         rotateInViz: true,
@@ -695,37 +695,16 @@ function drawInterpretationPanel(latest) {
   const panelY = HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
   const panelW = width - 48;
   const panelH = INTERPRETATION_BLOCK_HEIGHT;
-  const profileText =
-    "Profil (EDI/L/P/E/D): " +
-    result.scores.edi +
-    "/" +
-    result.scores.liberal +
-    "/" +
-    result.scores.participatory +
-    "/" +
-    result.scores.egalitarian +
-    "/" +
-    result.scores.deliberative;
 
   drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
 
   noStroke();
   textAlign(LEFT, TOP);
 
-  fill("#f1f5ff");
-  textStyle(BOLD);
-  textSize(16);
-  text("Regime-Interpretation", panelX + 16, panelY + 14);
-
-  fill("#b9c2d8");
-  textStyle(NORMAL);
-  textSize(13);
-  text(profileText, panelX + 16, panelY + 38);
-
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(14);
-  text(result.regimeType, panelX + 16, panelY + 58);
+  textSize(16);
+  text(result.regimeType, panelX + 16, panelY + 18);
 
   fill("#d4dbec");
   textStyle(NORMAL);
@@ -733,7 +712,7 @@ function drawInterpretationPanel(latest) {
   text(
     result.interpretation,
     panelX + 16,
-    panelY + 80,
+    panelY + 46,
     panelW - 32,
     panelH - 16,
   );
