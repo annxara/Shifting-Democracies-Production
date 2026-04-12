@@ -696,8 +696,6 @@ function drawInterpretationPanel(latest) {
   const panelW = width - 48;
   const panelH = INTERPRETATION_BLOCK_HEIGHT;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
-
   noStroke();
   textAlign(LEFT, TOP);
 
