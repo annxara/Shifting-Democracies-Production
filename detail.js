@@ -262,7 +262,8 @@ function buildMemoryField(latest) {
 
         flowerIndex: i,
         size,
-        rotation: random(-1, 1),
+        rotateInViz: true,
+        rotation: random(-25, 25),
         growDelay: random(0, 700),
         growDuration: random(550, 1050),
         settled: false,
@@ -469,7 +470,9 @@ function drawSingleFlower(f) {
 
   translate(f.x, f.y);
 
-  rotate(f.rotation);
+  if (f.rotateInViz) {
+    rotate(f.rotation);
+  }
 
   noTint();
 
