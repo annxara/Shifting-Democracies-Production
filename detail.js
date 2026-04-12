@@ -50,27 +50,27 @@ const indicatorConfig = [
   {
     key: "v2x_libdem",
     label: "Liberal Democracy",
-    image: "pictures/forgetmenot_blue.png",
+    image: "pictures/forgetmenot_indigo.png",
   },
   {
     key: "v2x_polyarchy",
     label: "Polyarchy",
-    image: "pictures/forgetmenot_pink.png",
+    image: "pictures/forgetmenot_brightcyan.png",
   },
   {
     key: "v2x_partipdem",
     label: "Participatory Democracy",
-    image: "pictures/forgetmenot_green.png",
+    image: "pictures/forgetmenot_dodgerblue.png",
   },
   {
     key: "v2x_delibdem",
     label: "Deliberative Democracy",
-    image: "pictures/forgetmenot_yellow.png",
+    image: "pictures/forgetmenot_brightpurple.png",
   },
   {
     key: "stfdem",
     label: "Satisfaction with Democracy",
-    image: "pictures/forgetmenot_red.png",
+    image: "pictures/forgetmenot_magenta.png",
   },
   {
     key: "stfeco",
