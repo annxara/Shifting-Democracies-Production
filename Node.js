@@ -258,7 +258,7 @@ class Node {
         this.yearMatchesParams(yearData, params)
       ) {
         const x = startX + i * sectionWidth;
-        fill("#FFECA0");
+        fill("#F3F584");
 
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
@@ -280,7 +280,7 @@ class Node {
           if (allYears[i] === closestYearValue) {
             const x = startX + i * sectionWidth;
             noStroke();
-            fill("#FFFDD8"); // Light orange
+            fill("#FAF6C3"); // Light orange
 
             if (i === 0) {
               rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
