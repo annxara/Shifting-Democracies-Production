@@ -513,7 +513,23 @@ function getFlowerCount(latest, indicatorKey) {
 
 function isEssDataAvailable(latest, indicatorKey) {
   if (!indicatorKey.startsWith("stf")) return true;
-  return Number.isFinite(Number(latest[indicatorKey]));
+  const value = latest[indicatorKey];
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (
+      normalized === "" ||
+      normalized === "na" ||
+      normalized === "n/a" ||
+      normalized === "nan" ||
+      normalized === "null"
+    ) {
+      return false;
+    }
+  }
+
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue);
 }
 
 function drawLegend(latest) {
