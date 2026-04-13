@@ -17,6 +17,7 @@ let countries = [];
 let filteredCountries = [];
 let countryIndex = 0;
 let highlightedCountryName = "";
+const MAX_FILTERED_COUNTRIES = 50;
 
 // Survey years available in the dataset
 const ALL_YEARS = [
@@ -107,7 +108,8 @@ function draw() {
   // Draw each country
   for (let i = 0; i < countries.length; i++) {
     const country = countries[i];
-    country.render(ALL_YEARS, params, hasAnyMatch);
+    const isSelected = country.country === highlightedCountryName;
+    country.render(ALL_YEARS, params, hasAnyMatch, isSelected);
   }
 
   // Draw legend in top right corner
@@ -121,7 +123,26 @@ function onParamsChange() {
 
   filteredCountries = countries.filter(
     (country) => country.closest && country.closest.year !== null,
-  );
+  ).slice(0, MAX_FILTERED_COUNTRIES);
+
+  if (filteredCountries.length === 0) {
+    countryIndex = 0;
+    highlightedCountryName = "";
+  } else {
+    const highlightedIndex = filteredCountries.findIndex(
+      (country) => country.country === highlightedCountryName,
+    );
+
+    if (highlightedIndex >= 0) {
+      countryIndex = highlightedIndex;
+    } else {
+      countryIndex = Math.max(
+        0,
+        Math.min(countryIndex, filteredCountries.length - 1),
+      );
+      highlightedCountryName = filteredCountries[countryIndex].country;
+    }
+  }
 
   console.log(
     `Params: stfeco=${params.stfeco}, stflife=${params.stflife}, stfgov=${params.stfgov}`,

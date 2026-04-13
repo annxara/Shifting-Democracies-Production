@@ -131,7 +131,6 @@ class Node {
   // ==== MAIN RENDER FUNCTION ====
   // Draws the country data card visualization
   // Shows: year timeline, data indicators, and satisfaction metrics
-  render(allYears, params, hasAnyMatch = true) {
     if (!this.closest || this.closest.year === null) return;
 
     push();
