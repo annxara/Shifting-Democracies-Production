@@ -511,6 +511,11 @@ function getFlowerCount(latest, indicatorKey) {
   return Math.round(constrain(rawValue, 0, 10));
 }
 
+function isEssDataAvailable(latest, indicatorKey) {
+  if (!indicatorKey.startsWith("stf")) return true;
+  return Number.isFinite(Number(latest[indicatorKey]));
+}
+
 function drawLegend(latest) {
   // Show V-Dem indicators on the left and ESS indicators on the right.
   const vDemIndicators = indicatorConfig.filter((item) =>
@@ -726,6 +731,8 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   const index = indicatorConfig.findIndex(
     (item) => item.key === configItem.key,
   );
+  const isEss = configItem.key.startsWith("stf");
+  const hasEssData = isEssDataAvailable(latest, configItem.key);
   const flowerCount = getFlowerCount(latest, configItem.key);
 
   // Draw one example flower.
@@ -741,7 +748,11 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   fill("#98a1b7");
   textStyle(NORMAL);
   textSize(FONT_SIZE_BODY);
-  text(String(flowerCount), baseX + 34, y + 10);
+  text(
+    isEss && !hasEssData ? "No Data Available" : String(flowerCount),
+    baseX + 34,
+    y + 10,
+  );
 }
 
 function drawFooter() {
