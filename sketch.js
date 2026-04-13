@@ -125,8 +125,8 @@ function draw() {
   background(0);
 
   // Draw 3 simple vertical guide lines at column centers
-  stroke(255, 100);
-  strokeWeight(2);
+  stroke(255, 75);
+  strokeWeight(260);
   const numCols = 3;
   const colWidth = width / numCols;
   for (let col = 0; col < numCols; col++) {
