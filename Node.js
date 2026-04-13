@@ -131,6 +131,7 @@ class Node {
   // ==== MAIN RENDER FUNCTION ====
   // Draws the country data card visualization
   // Shows: year timeline, data indicators, and satisfaction metrics
+  render(allYears, params, hasAnyMatch = true, isSelected = false) {
     if (!this.closest || this.closest.year === null) return;
 
     push();
@@ -204,6 +205,20 @@ class Node {
 
     rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
 
+    if (isSelected) {
+      // Draw a clear accent stroke so the GUI-selected country is obvious.
+      noFill();
+      stroke("#E8FA5F");
+      strokeWeight(2.2);
+      rect(
+        -rectWidth / 2 - 3,
+        -rectHeight / 2 - 3,
+        rectWidth + 6,
+        rectHeight + 6,
+        corner + 2,
+      );
+    }
+
     // Draw white background for years that have satisfaction data
     noStroke();
     for (let i = 0; i < allYears.length; i++) {
@@ -213,8 +228,8 @@ class Node {
         const x = startX + i * sectionWidth;
         const isMatching = this.yearMatchesParams(yearData, params);
 
-        // Full opacity for matching, reduced for non-matching
-        fill(255, isMatching ? 255 : 255);
+        // Apply consistent 60% opacity to year blocks
+        fill(255, 153);
 
         let radius = 0;
         if (i === 0) {
@@ -234,7 +249,7 @@ class Node {
       const yearData = yearMap[year];
       if (yearData && !this.hasSatisfactionData(yearData)) {
         const x = startX + i * sectionWidth;
-        fill(170);
+        fill(170, 77);
 
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
@@ -257,7 +272,7 @@ class Node {
         this.yearMatchesParams(yearData, params)
       ) {
         const x = startX + i * sectionWidth;
-        fill("#E8FA5F");
+        fill(232, 250, 95, 153);
 
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
@@ -279,7 +294,7 @@ class Node {
           if (allYears[i] === closestYearValue) {
             const x = startX + i * sectionWidth;
             noStroke();
-            fill("#FFFECB"); // Light orange
+            fill(255, 254, 203, 153); // Light orange
 
             if (i === 0) {
               rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
@@ -311,7 +326,7 @@ class Node {
         this.yearMatchesParams(yearData, params)
       ) {
         const x = startX + i * sectionWidth + sectionWidth / 2;
-        fill(255);
+        fill(255, 153);
         textAlign(CENTER);
         textSize(9);
         //textStyle(BOLD);
@@ -329,7 +344,7 @@ class Node {
         for (let i = 0; i < allYears.length; i++) {
           if (allYears[i] === closestYearValue) {
             const x = startX + i * sectionWidth + sectionWidth / 2;
-            fill(255);
+            fill(255, 153);
             textAlign(CENTER);
             textSize(9);
             //textStyle(BOLD);
