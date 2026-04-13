@@ -307,7 +307,7 @@ function drawLegend() {
 
   const circleRadius = 4;
   const circleSpacing = 18;
-  const columnSpacing = 115; // Space between columns
+  const columnSpacing = 128; // Space between columns
 
   for (let i = 0; i < vdemLabels.length; i++) {
     const column = i % 2;
