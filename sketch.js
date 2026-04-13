@@ -24,6 +24,47 @@ const ALL_YEARS = [
   2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020, 2023,
 ];
 
+// Country name translations (English to German)
+const countryTranslations = {
+  "Albania": "Albanien",
+  "Austria": "Österreich",
+  "Belgium": "Belgien",
+  "Bulgaria": "Bulgarien",
+  "Croatia": "Kroatien",
+  "Cyprus": "Zypern",
+  "Czechia": "Tschechien",
+  "Denmark": "Dänemark",
+  "Estonia": "Estland",
+  "Finland": "Finnland",
+  "France": "Frankreich",
+  "Germany": "Deutschland",
+  "Greece": "Griechenland",
+  "Hungary": "Ungarn",
+  "Iceland": "Island",
+  "Ireland": "Irland",
+  "Israel": "Israel",
+  "Italy": "Italien",
+  "Kosovo": "Kosovo",
+  "Latvia": "Lettland",
+  "Lithuania": "Litauen",
+  "Luxembourg": "Luxemburg",
+  "Montenegro": "Montenegro",
+  "Netherlands": "Niederlande",
+  "North Macedonia": "Nordmazedonien",
+  "Norway": "Norwegen",
+  "Poland": "Polen",
+  "Portugal": "Portugal",
+  "Romania": "Rumänien",
+  "Serbia": "Serbien",
+  "Slovakia": "Slowakei",
+  "Slovenia": "Slowenien",
+  "Spain": "Spanien",
+  "Sweden": "Schweden",
+  "Switzerland": "Schweiz",
+  "Ukraine": "Ukraine",
+  "United Kingdom": "Vereinigtes Königreich"
+};
+
 // Current filter parameters (controlled by gui.html)
 // stfeco: satisfaction with economy (0-10)
 // stflife: satisfaction with life (0-10)
@@ -45,7 +86,8 @@ function setup() {
 
   // data is now an array of { country, years: [...] }
   for (const entry of data) {
-    let c = new Node(entry.country, entry.years);
+    const translatedName = countryTranslations[entry.country] || entry.country;
+    let c = new Node(translatedName, entry.years);
     countries.push(c);
   }
 
@@ -84,8 +126,8 @@ function draw() {
   background(0);
 
   // Draw 3 simple vertical guide lines at column centers
-  stroke(255, 100);
-  strokeWeight(2);
+  stroke(255, 75);
+  strokeWeight(300);
   const numCols = 3;
   const colWidth = width / numCols;
   for (let col = 0; col < numCols; col++) {
@@ -242,38 +284,38 @@ function drawLegend() {
   fill(255);
   textSize(9);
   textStyle(NORMAL);
-  text("1 Block = 1 Year ", legendX + 10, exampleY + 5 + exampleH + 11);
+  text("1 Block = 1 Jahr ", legendX + 10, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
   fill(170);
-  rect(legendX + 125, exampleY + 5 + exampleH + 3, 12, 10, 2);
+  rect(legendX + 137, exampleY + 5 + exampleH + 3, 12, 10, 2);
   fill(255);
-  text("= Missing ESS Data", legendX + 140, exampleY + 5 + exampleH + 11);
+  text("= Fehlende ESS-Daten", legendX + 152, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
   fill("#E8FA5F");
   rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
-  text("= exact Match", legendX + 25, exampleY + 5 + exampleH + 23);
+  text("= exakte Übereinstimmung", legendX + 25, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
   fill("#FFFECB");
-  rect(legendX + 125, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  rect(legendX + 137, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   text(
-    "= closest year to Parameters",
-    legendX + 140,
+    "= nächstgelegenes Jahr zu\n   den Parameteren",
+    legendX + 152,
     exampleY + 5 + exampleH + 23,
   );
 
   // Draw colored circles for data dimensions
   const vdemLabels = [
-    "Polyarchy",
-    "Liberal Democracy",
-    "Egalitarian Democracy",
-    "Deliberative Democracy",
-    "Participatory Democracy",
-    "Satisfaction with Democracy",
+    "Polyarchie",
+    "Liberales Demokratie",
+    "Egalitäre Demokratie",
+    "Deliberative Demokratie",
+    "Partizipative Demokratie",
+    "Zufriedenheit mit Demokratie",
   ];
   const vdemColors = [
     "#00D9FF", // v2x_polyarchy - bright cyan
@@ -286,13 +328,13 @@ function drawLegend() {
 
   const circleRadius = 4;
   const circleSpacing = 18;
-  const columnSpacing = 115; // Space between columns
+  const columnSpacing = 128; // Space between columns
 
   for (let i = 0; i < vdemLabels.length; i++) {
     const column = i % 2;
     const row = Math.floor(i / 2);
     const circleX = legendX + 15 + column * columnSpacing;
-    const circleY = legendY + 45 + exampleH + 30 + row * circleSpacing;
+    const circleY = legendY + 45 + exampleH + 35 + row * circleSpacing;
 
     // Draw circle
     fill(vdemColors[i]);
