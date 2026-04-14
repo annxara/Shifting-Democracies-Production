@@ -35,7 +35,7 @@ const LEGEND_FONT_SIZE_TITLE = 24;
 const LEGEND_FONT_SIZE_LABEL = 18;
 const LEGEND_FONT_SIZE_VALUE = 17;
 const LEGEND_FLOWER_SIZE = 36;
-const TITLE_TO_SUBTEXT_GAP = 54;
+const TITLE_TO_SUBTEXT_GAP = 20;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
