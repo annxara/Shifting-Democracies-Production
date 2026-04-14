@@ -10,6 +10,7 @@ let socketConnected = false;
 let countryData = [];
 let filteredCountries = [];
 let countryIndex = 0;
+let highlightedYearIndex = 0;
 let flowerImages = [];
 let interpretationCsvLines = [];
 let interpretationLookup = new Map();
@@ -34,6 +35,7 @@ const LEGEND_FONT_SIZE_TITLE = 24;
 const LEGEND_FONT_SIZE_LABEL = 18;
 const LEGEND_FONT_SIZE_VALUE = 17;
 const LEGEND_FLOWER_SIZE = 36;
+const TITLE_TO_SUBTEXT_GAP = 54;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -214,9 +216,14 @@ function draw() {
     return;
   }
 
-  // Pick the current country and newest year.
+  // Pick the current country and currently selected highlighted year.
   const country = filteredCountries[countryIndex];
-  const latest = getLatestYearEntry(country.years);
+  const latest = getSelectedHighlightedYearEntry(country);
+
+  if (!latest) {
+    drawNoMatchState();
+    return;
+  }
 
   // Rebuild the flower layout when the country changes.
   const currentKey = country.country + "-" + latest.year;
@@ -250,7 +257,11 @@ function drawHeader(country, latest) {
   textStyle(NORMAL);
   textSize(FONT_SIZE_BODY);
   fill("#b6bfd4");
-  text("Jahr: " + latest.year + " (neuester Wert)", panelX + 24, panelY + 70);
+  text(
+    "Jahr: " + latest.year + " (neuester Wert)",
+    panelX + 24,
+    panelY + 16 + TITLE_TO_SUBTEXT_GAP,
+  );
 }
 
 function drawTree(latest) {
@@ -597,7 +608,7 @@ function drawLegend(latest) {
   const contentWidth = panelW - 36;
   const columnWidth = contentWidth / 2;
   const titlesY = panelY + 28;
-  const rowsStartY = panelY + 70;
+  const rowsStartY = titlesY + TITLE_TO_SUBTEXT_GAP;
   const rowHeight = 48;
 
   drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
@@ -778,10 +789,11 @@ function drawInterpretationPanel(latest) {
   fill("#d4dbec");
   textStyle(NORMAL);
   textSize(FONT_SIZE_BODY);
+  const interpretationBodyY = panelY + 18 + TITLE_TO_SUBTEXT_GAP;
   text(
     result.interpretation,
     panelX + 16,
-    panelY + 46,
+    interpretationBodyY,
     panelW - 32,
     panelH - 16,
   );
@@ -904,14 +916,15 @@ function getLatestYearEntry(years) {
   return latest;
 }
 
-function findMatchingYear(country, activeParams) {
+function findMatchingYears(country, activeParams) {
   // Skip broken data.
-  if (!country || !country.years) return null;
+  if (!country || !country.years) return [];
 
   // Match only when all three numbers are the same.
   const tolerance = 0;
-  return (
-    country.years.find((details) => {
+
+  return country.years
+    .filter((details) => {
       if (Number(details.year) === 2025) return false;
 
       return (
@@ -922,8 +935,26 @@ function findMatchingYear(country, activeParams) {
         details.stfgov !== undefined &&
         Math.abs(Number(details.stfgov) - activeParams.stfgov) <= tolerance
       );
-    }) || null
+    })
+    .sort((a, b) => Number(a.year) - Number(b.year));
+}
+
+function getSelectedHighlightedYearEntry(country) {
+  if (!country || !Array.isArray(country.highlightedYears)) {
+    return null;
+  }
+
+  if (country.highlightedYears.length === 0) {
+    return null;
+  }
+
+  highlightedYearIndex = constrain(
+    highlightedYearIndex,
+    0,
+    country.highlightedYears.length - 1,
   );
+
+  return country.highlightedYears[highlightedYearIndex] || null;
 }
 
 function applyFilterAndResetIndex() {
@@ -932,15 +963,25 @@ function applyFilterAndResetIndex() {
   if (countries.length === 0) {
     filteredCountries = [];
     countryIndex = 0;
+    highlightedYearIndex = 0;
     return;
   }
 
-  // Keep only the countries that match the current settings.
+  // Keep only countries with one or more exact matching years,
+  // and store all highlighted years in chronological order.
   countryData = countries;
-  filteredCountries = countryData.filter((country) =>
-    findMatchingYear(country, params),
-  );
+  filteredCountries = countryData
+    .map((country) => {
+      const highlightedYears = findMatchingYears(country, params);
+      return {
+        ...country,
+        highlightedYears,
+      };
+    })
+    .filter((country) => country.highlightedYears.length > 0);
+
   countryIndex = 0;
+  highlightedYearIndex = 0;
   flowerCloud = [];
   flowerCloudKey = "";
   emitCountryState();
@@ -966,19 +1007,48 @@ function emitCountryState() {
   });
 }
 
+function stepSelection(direction) {
+  if (filteredCountries.length === 0) return;
+
+  const currentCountry = filteredCountries[countryIndex];
+  const currentYears = currentCountry.highlightedYears || [];
+  const currentYearCount = currentYears.length;
+
+  if (direction > 0) {
+    if (currentYearCount > 0 && highlightedYearIndex < currentYearCount - 1) {
+      highlightedYearIndex += 1;
+    } else {
+      countryIndex = (countryIndex + 1) % filteredCountries.length;
+      highlightedYearIndex = 0;
+    }
+  } else {
+    if (currentYearCount > 0 && highlightedYearIndex > 0) {
+      highlightedYearIndex -= 1;
+    } else {
+      countryIndex =
+        (countryIndex - 1 + filteredCountries.length) % filteredCountries.length;
+
+      const previousCountry = filteredCountries[countryIndex];
+      const previousCount = (previousCountry.highlightedYears || []).length;
+      highlightedYearIndex = Math.max(0, previousCount - 1);
+    }
+  }
+
+  flowerCloud = [];
+  flowerCloudKey = "";
+  emitCountryState();
+}
+
 function keyPressed() {
-  // Use the arrow keys to move through the countries.
+  // Arrow navigation iterates highlighted years first, then moves country.
   if (filteredCountries.length === 0) return;
 
   if (keyCode === RIGHT_ARROW) {
-    countryIndex = (countryIndex + 1) % filteredCountries.length;
-    emitCountryState();
+    stepSelection(1);
   }
 
   if (keyCode === LEFT_ARROW) {
-    countryIndex =
-      (countryIndex - 1 + filteredCountries.length) % filteredCountries.length;
-    emitCountryState();
+    stepSelection(-1);
   }
 }
 
@@ -1017,6 +1087,9 @@ function connectSocket() {
     if (typeof incoming.index === "number" && Number.isFinite(incoming.index)) {
       const len = filteredCountries.length;
       countryIndex = ((Math.floor(incoming.index) % len) + len) % len;
+      highlightedYearIndex = 0;
+      flowerCloud = [];
+      flowerCloudKey = "";
       emitCountryState();
       return;
     }
@@ -1027,6 +1100,9 @@ function connectSocket() {
       );
       if (selectedIndex >= 0) {
         countryIndex = selectedIndex;
+        highlightedYearIndex = 0;
+        flowerCloud = [];
+        flowerCloudKey = "";
         emitCountryState();
       }
     }
