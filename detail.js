@@ -30,6 +30,10 @@ const BINARY_HIGH_THRESHOLD = 0.5;
 const FONT_SIZE_TITLE = 56;
 const FONT_SIZE_SECTION = 32;
 const FONT_SIZE_BODY = 24;
+const LEGEND_FONT_SIZE_TITLE = 24;
+const LEGEND_FONT_SIZE_LABEL = 18;
+const LEGEND_FONT_SIZE_VALUE = 17;
+const LEGEND_FLOWER_SIZE = 36;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -234,8 +238,6 @@ function drawHeader(country, latest) {
   const panelY = 20;
   const panelW = width - 48;
   const panelH = HEADER_BLOCK_HEIGHT - 26;
-
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
 
   fill("#f7f9ff");
   noStroke();
@@ -614,7 +616,7 @@ function drawLegend(latest) {
 
   fill("#f1f5ff");
   textStyle(BOLD);
-  textSize(FONT_SIZE_SECTION);
+  textSize(LEGEND_FONT_SIZE_TITLE);
   text("V-Dem Values", startX, titlesY);
   text("ESS Values", startX + columnWidth, titlesY);
   textStyle(NORMAL);
@@ -797,18 +799,24 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   const flowerCount = getFlowerCount(latest, configItem.key);
 
   // Draw one example flower.
-  image(flowerImages[index], baseX + 12, y, 30, 30);
+  image(
+    flowerImages[index],
+    baseX + 12,
+    y,
+    LEGEND_FLOWER_SIZE,
+    LEGEND_FLOWER_SIZE,
+  );
 
   // Show label.
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(FONT_SIZE_BODY);
+  textSize(LEGEND_FONT_SIZE_LABEL);
   text(configItem.label, baseX + 34, y - 9);
 
   // Show real flower count currently rendered in the garden.
   fill("#98a1b7");
   textStyle(NORMAL);
-  textSize(FONT_SIZE_BODY);
+  textSize(LEGEND_FONT_SIZE_VALUE);
   text(
     isEss && !hasEssData ? "No Data Available" : String(flowerCount),
     baseX + 34,
