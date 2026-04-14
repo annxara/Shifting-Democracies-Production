@@ -658,8 +658,8 @@ function drawLegend(latest) {
   fill("#f1f5ff");
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_TITLE);
-  text("V-Dem Werte", startX, titlesY);
-  text("ESS Werte", startX + columnWidth, titlesY);
+  text("Wissenschfliche Beurteilungen", startX, titlesY);
+  text("Volksempfinden", startX + columnWidth, titlesY);
   textStyle(NORMAL);
 
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
