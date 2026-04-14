@@ -667,7 +667,7 @@ function drawLegend(latest) {
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_TITLE);
   text("Demokratie-Scores", startX, titlesY);
-  text("Volksempfinden", startX + 50 + columnWidth, titlesY);
+  text("Volksempfinden", startX + columnWidth, titlesY);
   textStyle(NORMAL);
 
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
