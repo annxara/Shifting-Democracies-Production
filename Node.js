@@ -47,18 +47,23 @@ class Node {
       );
     });
 
-    // Store matching year for opacity highlighting, but always use first year for centering
+    // Track if there's any exact match and get the first matching year
+    const hasExactMatch = matchedDetails.length > 0;
     const matchingData = matchedDetails[0] || null;
     const matchingYear = matchingData ? matchingData.year : null;
 
-    // Always set a year for rendering (use first year)
-    const renderYear =
-      this.years && this.years.length > 0 ? this.years[0].year : null;
+    // If there's an exact match, use the matching year for rendering; otherwise use first year
+    const renderYear = hasExactMatch
+      ? matchingYear
+      : this.years && this.years.length > 0
+        ? this.years[0].year
+        : null;
 
     this.closest = {
       year: renderYear,
-      data: this.years && this.years.length > 0 ? this.years[0] : null,
+      data: matchingData || (this.years && this.years.length > 0 ? this.years[0] : null),
       matchingYear,
+      hasExactMatch,
     };
     return this.closest;
   }
