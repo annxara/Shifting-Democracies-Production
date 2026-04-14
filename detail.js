@@ -305,7 +305,7 @@ function drawMainFrame(layout) {
 }
 
 function drawHeader(country, latest, regimeInfo, layout) {
-  // Structured top area: country/year on left, democracy type on right.
+  // Structured top area with shared rows: country + type label, year + type value.
   const panelX = layout.contentX;
   const panelY = layout.headerY;
   const panelW = layout.contentW;
@@ -320,6 +320,9 @@ function drawHeader(country, latest, regimeInfo, layout) {
   const leftX = panelX + 22;
   const leftY = panelY + 14;
   const leftW = typeCardX - leftX - 16;
+  const rightX = typeCardX + 14;
+  const rowTopY = leftY;
+  const rowBottomY = leftY + HEADER_TITLE_TO_SUBTEXT_GAP - 2;
 
   drawUiPanel(typeCardX, typeCardY, typeCardW, typeCardH, 16, "#000000", "#ffffff");
 
@@ -334,28 +337,28 @@ function drawHeader(country, latest, regimeInfo, layout) {
     textSize(titleSize);
   }
   textSize(titleSize);
-  text(country.country, leftX, leftY);
-
-  textStyle(NORMAL);
-  textSize(FONT_SIZE_BODY);
-  fill("#b6bfd4");
-  text("Jahr: " + latest.year, leftX + 2, leftY + HEADER_TITLE_TO_SUBTEXT_GAP - 2);
+  text(country.country, leftX, rowTopY);
 
   noStroke();
   fill("#98a1b7");
   textStyle(NORMAL);
   textSize(13);
-  text("Demokratietyp", typeCardX + 14, typeCardY + 10);
+  text("Demokratietyp", rightX, rowTopY + 1);
+
+  textStyle(NORMAL);
+  textSize(FONT_SIZE_BODY);
+  fill("#b6bfd4");
+  text("Jahr: " + latest.year, leftX + 2, rowBottomY);
 
   fill("#f1f5ff");
   textStyle(BOLD);
   textSize(18);
   text(
     regimeInfo.regimeType,
-    typeCardX + 14,
-    typeCardY + 29,
+    rightX,
+    rowBottomY,
     typeCardW - 28,
-    typeCardH - 33,
+    typeCardH - (rowBottomY - typeCardY),
   );
 }
 
