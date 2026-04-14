@@ -97,7 +97,7 @@ function renderCountry(direction = "none") {
 }
 
 function renderYear() {
-  if (!Number.isFinite(activeYear) || totalYearCount <= 0) {
+  if (activeYear === null || activeYear === undefined || totalYearCount <= 0) {
     yearNameEl.textContent = "-";
     yearMetaEl.textContent = "0 / 0";
     prevYearButton.disabled = true;
@@ -105,7 +105,10 @@ function renderYear() {
     return;
   }
 
-  const clampedIndex = Math.max(0, Math.min(activeYearIndex, totalYearCount - 1));
+  const clampedIndex = Math.max(
+    0,
+    Math.min(Number(activeYearIndex) || 0, totalYearCount - 1),
+  );
   yearNameEl.textContent = String(activeYear);
   yearMetaEl.textContent = `${clampedIndex + 1} / ${totalYearCount}`;
   prevYearButton.disabled = totalYearCount <= 1;
@@ -115,12 +118,12 @@ function renderYear() {
 // Apply country state received from sketch via socket
 function applyCountryState(state, direction = "none") {
   countries = Array.isArray(state?.countries) ? state.countries : [];
-  activeYear = Number(state?.activeYear);
-  activeYearIndex = Number.isFinite(state?.activeYearIndex)
-    ? state.activeYearIndex
+  activeYear = state?.activeYear ?? null;
+  activeYearIndex = Number.isFinite(Number(state?.activeYearIndex))
+    ? Number(state.activeYearIndex)
     : 0;
-  totalYearCount = Number.isFinite(state?.totalYearCount)
-    ? state.totalYearCount
+  totalYearCount = Number.isFinite(Number(state?.totalYearCount))
+    ? Number(state.totalYearCount)
     : 0;
 
   if (countries.length === 0) {
