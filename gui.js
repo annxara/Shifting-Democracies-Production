@@ -30,10 +30,16 @@ const statusEl = document.getElementById("status");
 const countryDisplayEl = document.getElementById("country-display");
 const countryNameEl = document.getElementById("country-name");
 const countryMetaEl = document.getElementById("country-meta");
+const yearNameEl = document.getElementById("year-name");
+const yearMetaEl = document.getElementById("year-meta");
 const prevCountryButton = document.getElementById("prev-country");
 const nextCountryButton = document.getElementById("next-country");
 const prevYearButton = document.getElementById("prev-year");
 const nextYearButton = document.getElementById("next-year");
+
+let activeYear = null;
+let activeYearIndex = 0;
+let totalYearCount = 0;
 
 // Update connection status display
 function setConnectionStatus(connected) {
@@ -90,13 +96,37 @@ function renderCountry(direction = "none") {
   }
 }
 
+function renderYear() {
+  if (!Number.isFinite(activeYear) || totalYearCount <= 0) {
+    yearNameEl.textContent = "-";
+    yearMetaEl.textContent = "0 / 0";
+    prevYearButton.disabled = true;
+    nextYearButton.disabled = true;
+    return;
+  }
+
+  const clampedIndex = Math.max(0, Math.min(activeYearIndex, totalYearCount - 1));
+  yearNameEl.textContent = String(activeYear);
+  yearMetaEl.textContent = `${clampedIndex + 1} / ${totalYearCount}`;
+  prevYearButton.disabled = totalYearCount <= 1;
+  nextYearButton.disabled = totalYearCount <= 1;
+}
+
 // Apply country state received from sketch via socket
 function applyCountryState(state, direction = "none") {
   countries = Array.isArray(state?.countries) ? state.countries : [];
+  activeYear = Number(state?.activeYear);
+  activeYearIndex = Number.isFinite(state?.activeYearIndex)
+    ? state.activeYearIndex
+    : 0;
+  totalYearCount = Number.isFinite(state?.totalYearCount)
+    ? state.totalYearCount
+    : 0;
 
   if (countries.length === 0) {
     selectedCountryIndex = 0;
     renderCountry();
+    renderYear();
     return;
   }
 
@@ -114,6 +144,7 @@ function applyCountryState(state, direction = "none") {
   }
 
   renderCountry(direction);
+  renderYear();
 }
 
 // Handle country selection navigation (prev/next buttons)
@@ -215,3 +246,4 @@ socket.on("country-state", (incoming) => {
 // ==== INITIALIZATION ====
 syncSliders();
 renderCountry();
+renderYear();

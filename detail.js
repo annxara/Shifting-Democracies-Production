@@ -1023,16 +1023,26 @@ function emitCountryState() {
         countries: [],
         activeCountry: "",
         activeIndex: 0,
+        activeYear: null,
+        activeYearIndex: 0,
+        totalYearCount: 0,
       });
     }
     return;
   }
 
   countryIndex = constrain(countryIndex, 0, filteredCountries.length - 1);
+  const currentCountry = filteredCountries[countryIndex];
+  const currentYears = currentCountry.highlightedYears || [];
+  const currentYear = getSelectedHighlightedYearEntry(currentCountry);
+
   socket.emit("country-state", {
     countries: filteredCountries.map((country) => country.country),
-    activeCountry: filteredCountries[countryIndex].country,
+    activeCountry: currentCountry.country,
     activeIndex: countryIndex,
+    activeYear: currentYear ? Number(currentYear.year) : null,
+    activeYearIndex: highlightedYearIndex,
+    totalYearCount: currentYears.length,
   });
 }
 
