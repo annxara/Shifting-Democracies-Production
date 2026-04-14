@@ -1084,6 +1084,16 @@ function connectSocket() {
   socket.on("country-selection", (incoming) => {
     if (filteredCountries.length === 0 || !incoming) return;
 
+    if (incoming.yearDirection === "next") {
+      stepSelection(1);
+      return;
+    }
+
+    if (incoming.yearDirection === "prev") {
+      stepSelection(-1);
+      return;
+    }
+
     if (typeof incoming.index === "number" && Number.isFinite(incoming.index)) {
       const len = filteredCountries.length;
       countryIndex = ((Math.floor(incoming.index) % len) + len) % len;

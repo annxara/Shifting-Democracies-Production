@@ -32,6 +32,8 @@ const countryNameEl = document.getElementById("country-name");
 const countryMetaEl = document.getElementById("country-meta");
 const prevCountryButton = document.getElementById("prev-country");
 const nextCountryButton = document.getElementById("next-country");
+const prevYearButton = document.getElementById("prev-year");
+const nextYearButton = document.getElementById("next-year");
 
 // Update connection status display
 function setConnectionStatus(connected) {
@@ -137,6 +139,15 @@ function emitCountrySelection(direction) {
   });
 }
 
+// Handle highlighted year navigation within current country
+function emitYearSelection(direction) {
+  if (direction !== "prev" && direction !== "next") return;
+
+  socket.emit("country-selection", {
+    yearDirection: direction,
+  });
+}
+
 // Handle arrow key navigation (ArrowLeft, ArrowRight)
 function handleCountryKeydown(event) {
   if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
@@ -173,6 +184,8 @@ Object.keys(params).forEach((key) => {
 // ==== COUNTRY NAVIGATION BUTTONS ====
 prevCountryButton.addEventListener("click", () => emitCountrySelection("prev"));
 nextCountryButton.addEventListener("click", () => emitCountrySelection("next"));
+prevYearButton.addEventListener("click", () => emitYearSelection("prev"));
+nextYearButton.addEventListener("click", () => emitYearSelection("next"));
 
 // ==== KEYBOARD NAVIGATION ====
 window.addEventListener("keydown", handleCountryKeydown);
