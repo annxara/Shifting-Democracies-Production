@@ -163,8 +163,10 @@ function onParamsChange() {
     node.findMatchingYear(params);
   });
 
+  // Filter countries that have exact matching parameters in any year
+  // Maintain sketch 1 column order by keeping countries in their original positions
   filteredCountries = countries.filter(
-    (country) => country.closest && country.closest.year !== null,
+    (country) => country.closest && country.closest.hasExactMatch === true,
   ).slice(0, MAX_FILTERED_COUNTRIES);
 
   if (filteredCountries.length === 0) {
@@ -189,6 +191,7 @@ function onParamsChange() {
   console.log(
     `Params: stfeco=${params.stfeco}, stflife=${params.stflife}, stfgov=${params.stfgov}`,
   );
+  console.log(`Filtered countries with exact matches: ${filteredCountries.length}`);
 
   publishCountryState();
 }
