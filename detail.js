@@ -45,6 +45,47 @@ const params = {
   stfgov: 5,
 };
 
+// Country name translations (English to German), kept in sync with sketch 1.
+const countryTranslations = {
+  Albania: "Albanien",
+  Austria: "Österreich",
+  Belgium: "Belgien",
+  Bulgaria: "Bulgarien",
+  Croatia: "Kroatien",
+  Cyprus: "Zypern",
+  Czechia: "Tschechien",
+  Denmark: "Dänemark",
+  Estonia: "Estland",
+  Finland: "Finnland",
+  France: "Frankreich",
+  Germany: "Deutschland",
+  Greece: "Griechenland",
+  Hungary: "Ungarn",
+  Iceland: "Island",
+  Ireland: "Irland",
+  Israel: "Israel",
+  Italy: "Italien",
+  Kosovo: "Kosovo",
+  Latvia: "Lettland",
+  Lithuania: "Litauen",
+  Luxembourg: "Luxemburg",
+  Montenegro: "Montenegro",
+  Netherlands: "Niederlande",
+  "North Macedonia": "Nordmazedonien",
+  Norway: "Norwegen",
+  Poland: "Polen",
+  Portugal: "Portugal",
+  Romania: "Rumänien",
+  Serbia: "Serbien",
+  Slovakia: "Slowakei",
+  Slovenia: "Slowenien",
+  Spain: "Spanien",
+  Sweden: "Schweden",
+  Switzerland: "Schweiz",
+  Ukraine: "Ukraine",
+  "United Kingdom": "Vereinigtes Königreich",
+};
+
 // Each color belongs to one data variable.
 const indicatorConfig = [
   {
@@ -130,6 +171,10 @@ function setup() {
 
   // Make the data ready to use.
   countryData = toCountryArray(countryData);
+  countryData = countryData.map((entry) => ({
+    ...entry,
+    country: countryTranslations[entry.country] || entry.country,
+  }));
   interpretationLookup = buildInterpretationLookup(interpretationCsvLines);
 
   // Make all flower pictures the same size.
