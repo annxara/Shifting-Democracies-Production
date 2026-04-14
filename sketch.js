@@ -84,6 +84,12 @@ function preload() {
 function setup() {
   createCanvas(1920, 1080);
 
+  // Improve text rendering quality
+  pixelDensity(3); // Render at 3x resolution for ultra-crisp text
+  drawingContext.imageSmoothingEnabled = true;
+  drawingContext.textRendering = 'geometricPrecision';
+  drawingContext.font = '700 16px "Open Sans", sans-serif';
+
   // data is now an array of { country, years: [...] }
   for (const entry of data) {
     const translatedName = countryTranslations[entry.country] || entry.country;
@@ -226,8 +232,9 @@ function drawLegend() {
   fill(255);
   noStroke();
   textAlign(LEFT);
-  textSize(13);
+  textSize(16);
   textStyle(BOLD);
+  textFont("Open Sans");
   text("Legende", legendX + 123, legendY + 17);
 
   // Example rectangle with divisions and colors
@@ -286,26 +293,30 @@ function drawLegend() {
 
   // Legend text (split into 2 rows)
   fill(255);
-  textSize(9);
+  textSize(11);
   textStyle(NORMAL);
+  textFont("Open Sans");
   text("1 Block = 1 Jahr ", legendX + 10, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
   fill(170);
   rect(legendX + 137, exampleY + 5 + exampleH + 3, 12, 10, 2);
   fill(255);
+  textFont("Open Sans");
   text("= Fehlende ESS-Daten", legendX + 152, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
   fill("#E8FA5F");
   rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
+  textFont("Open Sans");
   text("= exakte Übereinstimmung", legendX + 25, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
   fill("#FFFECB");
   rect(legendX + 137, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
+  textFont("Open Sans");
   text(
     "= nächstgelegenes Jahr zu\n   den Parameteren",
     legendX + 152,
@@ -348,8 +359,9 @@ function drawLegend() {
     // Draw label
     fill(255);
     textAlign(LEFT);
-    textSize(9);
+    textSize(11);
     textStyle(NORMAL);
+    textFont("Open Sans");
     text(vdemLabels[i], circleX + 8, circleY + 2);
   }
 }

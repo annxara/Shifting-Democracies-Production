@@ -305,7 +305,7 @@ class Node {
 
     fill(255);
     textAlign(CENTER);
-    textSize(10);
+    textSize(12);
     textFont("Open Sans");
     textStyle(NORMAL);
     text(this.country, 0, 40);
@@ -322,8 +322,7 @@ class Node {
         const x = startX + i * sectionWidth + sectionWidth / 2;
         fill(255);
         textAlign(CENTER);
-        textSize(9);
-        //textStyle(BOLD);
+        textSize(11);
         textFont("Open Sans");
         text(year, x, startY - 5);
       }
@@ -340,8 +339,7 @@ class Node {
             const x = startX + i * sectionWidth + sectionWidth / 2;
             fill(255);
             textAlign(CENTER);
-            textSize(9);
-            //textStyle(BOLD);
+            textSize(11);
             textFont("Open Sans");
             text(closestYearValue, x, startY - 5);
             break;
