@@ -239,7 +239,7 @@ class Node {
       const yearData = yearMap[year];
       if (yearData && !this.hasSatisfactionData(yearData)) {
         const x = startX + i * sectionWidth;
-        fill(100);
+        fill(130);
 
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
