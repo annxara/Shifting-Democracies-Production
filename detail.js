@@ -34,7 +34,7 @@ const FONT_SIZE_BODY = 17;
 const LEGEND_FONT_SIZE_TITLE = 20;
 const LEGEND_FONT_SIZE_LABEL = 15;
 const LEGEND_FONT_SIZE_VALUE = 14;
-const LEGEND_FLOWER_SIZE = 26;
+const LEGEND_FLOWER_SIZE = 28;
 const FLOWER_RENDER_SCALE = 1.52;
 const HEADER_TITLE_TO_SUBTEXT_GAP = 46;
 const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
@@ -342,8 +342,10 @@ function drawHeader(country, latest, regimeInfo, layout) {
   noStroke();
   fill("#98a1b7");
   textStyle(NORMAL);
-  textSize(13);
-  text("Demokratietyp", rightX, rowTopY + 1);
+  const typeLabelSize = 13;
+  textSize(typeLabelSize);
+  const typeLabelY = rowTopY + Math.max(0, titleSize - typeLabelSize);
+  text("Demokratietyp", rightX, typeLabelY);
 
   textStyle(NORMAL);
   textSize(FONT_SIZE_BODY);
@@ -704,7 +706,7 @@ function drawLegend(latest, layout) {
   const rowsStartY = titlesY + LEGEND_TITLE_TO_ROWS_GAP;
   const maxRows = Math.max(vDemIndicators.length, essIndicators.length);
   const availableRowsHeight = panelH - (rowsStartY - panelY) - 16;
-  const rowHeight = Math.max(28, availableRowsHeight / Math.max(1, maxRows));
+  const rowHeight = Math.max(34, availableRowsHeight / Math.max(1, maxRows));
 
   stroke("#2f3850");
   strokeWeight(1);
