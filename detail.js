@@ -920,7 +920,7 @@ function drawNoMatchState() {
   fill(220);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(FONT_SIZE_SECTION);
+  textSize(20);
   textStyle(BOLD);
   text(
     "Keine Länder entsprechen den aktuellen Parametern.",
