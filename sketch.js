@@ -62,7 +62,7 @@ const countryTranslations = {
   "Sweden": "Schweden",
   "Switzerland": "Schweiz",
   "Ukraine": "Ukraine",
-  "United Kingdom": "Vereinigtes Königreich"
+  "United Kingdom": "UK"
 };
 
 // Current filter parameters (controlled by gui.html)
