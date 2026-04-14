@@ -96,7 +96,7 @@ const countryTranslations = {
 const indicatorConfig = [
   {
     key: "v2x_libdem",
-    label: "Liberal Democracy",
+    label: "Liberale Demokratie",
     image: "pictures/forgetmenot_indigo.png",
   },
   {
@@ -106,32 +106,32 @@ const indicatorConfig = [
   },
   {
     key: "v2x_partipdem",
-    label: "Participatory Democracy",
+    label: "Partizipative Demokratie",
     image: "pictures/forgetmenot_dodgerblue.png",
   },
   {
     key: "v2x_delibdem",
-    label: "Deliberative Democracy",
+    label: "Deliberative Demokratie",
     image: "pictures/forgetmenot_brightpurple.png",
   },
   {
     key: "stfdem",
-    label: "Satisfaction with Democracy",
+    label: "Zufriedenheit mit Demokratie",
     image: "pictures/forgetmenot_magenta.png",
   },
   {
     key: "stfeco",
-    label: "Satisfaction with Economy",
+    label: "Zufriedenheit mit der Wirtschaft",
     image: "pictures/forgetmenot_babyblue.png",
   },
   {
     key: "stflife",
-    label: "Satisfaction with Life",
+    label: "Zufriedenheit mit dem Leben",
     image: "pictures/forgetmenot_magenta.png",
   },
   {
     key: "stfgov",
-    label: "Satisfaction with Government",
+    label: "Zufriedenheit mit der Regierung",
     image: "pictures/forgetmenot_grassgreen.png",
   },
 ];
@@ -258,7 +258,7 @@ function drawHeader(country, latest) {
   textSize(FONT_SIZE_BODY);
   fill("#b6bfd4");
   text(
-    "Jahr: " + latest.year + " (neuester Wert)",
+    "Jahr: " + latest.year,
     panelX + 24,
     panelY + 16 + TITLE_TO_SUBTEXT_GAP,
   );
@@ -628,8 +628,8 @@ function drawLegend(latest) {
   fill("#f1f5ff");
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_TITLE);
-  text("V-Dem Values", startX, titlesY);
-  text("ESS Values", startX + columnWidth, titlesY);
+  text("V-Dem Werte", startX, titlesY);
+  text("ESS Werte", startX + columnWidth, titlesY);
   textStyle(NORMAL);
 
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
@@ -830,7 +830,7 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   textStyle(NORMAL);
   textSize(LEGEND_FONT_SIZE_VALUE);
   text(
-    isEss && !hasEssData ? "No Data Available" : String(flowerCount),
+    isEss && !hasEssData ? "Keine Daten" : String(flowerCount),
     baseX + 34,
     y + 10,
   );
