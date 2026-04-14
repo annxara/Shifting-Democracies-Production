@@ -814,13 +814,8 @@ function drawInterpretationPanel(result) {
 
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(22);
-  text("Einordnung", panelX + 16, panelY + 14);
-
-  fill("#d4dbec");
-  textStyle(NORMAL);
-  textSize(21);
-  const interpretationBodyY = panelY + 14 + INTERPRETATION_TITLE_TO_BODY_GAP;
+  textSize(28);
+  const interpretationBodyY = panelY + 14;
   text(
     result.interpretation,
     panelX + 16,
