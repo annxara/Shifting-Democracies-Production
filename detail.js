@@ -119,7 +119,7 @@ const indicatorConfig = [
   {
     key: "v2x_egaldem",
     label: "Egalitäre Demokratie",
-    image: "pictures/forgetmenot_toxicyellow.png",
+    image: "pictures/forgetmenot_teal.png",
   },
   {
     key: "stfdem",
@@ -139,7 +139,7 @@ const indicatorConfig = [
   {
     key: "stfgov",
     label: "Zufriedenheit mit der Regierung",
-    image: "pictures/forgetmenot_grassgreen.png",
+    image: "pictures/forgetmenot_orange.png",
   },
 ];
 
