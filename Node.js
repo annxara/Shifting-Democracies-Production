@@ -136,7 +136,7 @@ class Node {
   // ==== MAIN RENDER FUNCTION ====
   // Draws the country data card visualization
   // Shows: year timeline, data indicators, and satisfaction metrics
-  render(allYears, params, hasAnyMatch) {
+  render(allYears, params, hasAnyMatch, isSelected) {
     if (!this.closest || this.closest.year === null) return;
 
     push();
@@ -213,6 +213,14 @@ class Node {
     stroke(255);
     strokeWeight(1);
     rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
+
+    // Draw highlighted border if this country is selected
+    if (isSelected) {
+      noFill();
+      stroke("#E8FA5F");
+      strokeWeight(3);
+      rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
+    }
 
     // Draw white background for years that have satisfaction data
     noStroke();

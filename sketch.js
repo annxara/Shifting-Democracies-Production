@@ -295,14 +295,14 @@ function drawLegend() {
   textFont("Open Sans");
   text("= Fehlende ESS-Daten", legendX + 205, exampleY + 5 + exampleH + 11);
 
-  // Yellow rectangle for exact match
+  // green rectangle for exact match
   fill("#E8FA5F");
   rect(legendX + 30, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
   text("= exakte Übereinstimmung", legendX + 45, exampleY + 5 + exampleH + 23);
 
-  // Orange rectangle for closest year
+  // yellow rectangle for closest year
   fill("#FFFECB");
   rect(legendX + 190, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
@@ -315,8 +315,8 @@ function drawLegend() {
 
   // Draw colored circles for data dimensions
   const vdemLabels = [
-    "Polyarchie",
-    "Liberales Demokratie",
+    "Elektorale Demokratie",
+    "Liberale Demokratie",
     "Egalitäre Demokratie",
     "Deliberative Demokratie",
     "Partizipative Demokratie",
