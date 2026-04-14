@@ -666,7 +666,7 @@ function drawLegend(latest) {
   fill("#f1f5ff");
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_TITLE);
-  text("Wissenschfliche Beurteilungen", startX, titlesY);
+  text("Demokratie-Scores", startX, titlesY);
   text("Volksempfinden", startX + 50 + columnWidth, titlesY);
   textStyle(NORMAL);
 
