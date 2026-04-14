@@ -153,6 +153,20 @@ function applyCountryState(state, direction = "none") {
   renderYear();
 }
 
+function applyYearState(state) {
+  if (state?.source !== "detail") return;
+
+  activeYear = state?.activeYear ?? null;
+  activeYearIndex = Number.isFinite(Number(state?.activeYearIndex))
+    ? Number(state.activeYearIndex)
+    : 0;
+  totalYearCount = Number.isFinite(Number(state?.totalYearCount))
+    ? Number(state.totalYearCount)
+    : 0;
+
+  renderYear();
+}
+
 // Handle country selection navigation (prev/next buttons)
 function emitCountrySelection(direction) {
   if (countries.length === 0) return;
@@ -233,6 +247,7 @@ socket.on("connect", () => {
   setConnectionStatus(true);
   socket.emit("params", { ...params }); // Send initial params
   socket.emit("request-country-state"); // Request current country state
+  socket.emit("request-year-state"); // Request current year state
 });
 
 // When disconnecting from server
@@ -247,6 +262,11 @@ socket.on("params", (incoming) => {
 // When receiving country state (from sketch)
 socket.on("country-state", (incoming) => {
   applyCountryState(incoming);
+});
+
+// When receiving year state (from detail)
+socket.on("year-state", (incoming) => {
+  applyYearState(incoming);
 });
 
 // ==== INITIALIZATION ====
