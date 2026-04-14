@@ -365,7 +365,7 @@ function connectSocket() {
 
   socket.on("params", (incoming) => {
     Object.assign(params, incoming);
-    if (gui) {
+    if (typeof gui !== "undefined" && gui) {
       gui
         .controllersRecursive()
         .forEach((controller) => controller.updateDisplay());

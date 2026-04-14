@@ -206,8 +206,13 @@ class Node {
       "#FF00F2", // stfdem - magenta
     ];
 
-    // Draw data visualization for each variable (no border rectangle)
+    const corner = 12;
+
+    // Draw outer card border (restored)
     noFill();
+    stroke(255);
+    strokeWeight(1);
+    rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
 
     // Draw white background for years that have satisfaction data
     noStroke();
@@ -221,7 +226,6 @@ class Node {
         // Full opacity for matching, reduced for non-matching
         fill(170);
 
-        let radius = 0;
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
         } else if (i === allYears.length - 1) {
@@ -304,7 +308,7 @@ class Node {
     textSize(10);
     textFont("Open Sans");
     textStyle(NORMAL);
-    text(this.country, 0, lineH / 2 + 45);
+    text(this.country, 0, 40);
 
     // Draw year text above highlighted boxes
     for (let i = 0; i < allYears.length; i++) {
