@@ -35,7 +35,7 @@ const LEGEND_FONT_SIZE_TITLE = 24;
 const LEGEND_FONT_SIZE_LABEL = 18;
 const LEGEND_FONT_SIZE_VALUE = 17;
 const LEGEND_FLOWER_SIZE = 36;
-const HEADER_TITLE_TO_SUBTEXT_GAP = 57;
+const HEADER_TITLE_TO_SUBTEXT_GAP = 59;
 const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
 const LEGEND_TITLE_TO_ROWS_GAP = 54;
 
@@ -906,7 +906,7 @@ function drawNoMatchState() {
     height / 2 - 24,
   );
 
-  textSize(FONT_SIZE_BODY);
+  textSize(18);
   fill("#b8bcc8");
   text(
     "Zufriedenheit mit der Wirtschaft: " +
