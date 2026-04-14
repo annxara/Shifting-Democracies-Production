@@ -643,7 +643,7 @@ function drawLegend(latest) {
   const rowsStartY = titlesY + LEGEND_TITLE_TO_ROWS_GAP;
   const rowHeight = 48;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#000000", "#ffffff");
 
   stroke("#2f3850");
   strokeWeight(1);

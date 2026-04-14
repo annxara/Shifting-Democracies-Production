@@ -4,8 +4,8 @@
 :root {
   color-scheme: dark;
   --bg: #0f1118;
-  --panel: rgba(32, 33, 39, 0.96);
-  --panel-border: #444652;
+  --panel: rgba(0, 0, 0, 0.96);
+  --panel-border: #ffffff;
   --panel-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
   --text: #f7f9ff;
   --muted: #b6bfd4;
@@ -81,8 +81,8 @@ h1 {
   align-self: center;
   padding: 10px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(182, 191, 212, 0.18);
-  background: rgba(17, 19, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  background: rgba(0, 0, 0, 0.92);
   color: var(--muted);
   text-transform: lowercase;
   font-size: 13px;
@@ -103,8 +103,8 @@ h1 {
   margin-bottom: 24px;
   padding: 18px;
   border-radius: 22px;
-  border: 1px solid rgba(182, 191, 212, 0.14);
-  background: rgba(16, 17, 22, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .year-panel {
@@ -115,8 +115,8 @@ h1 {
   margin-bottom: 20px;
   padding: 14px;
   border-radius: 22px;
-  border: 1px solid rgba(182, 191, 212, 0.14);
-  background: rgba(16, 17, 22, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.9);
 }
 
 .year-panel .nav-button {
@@ -128,8 +128,8 @@ h1 {
   min-width: 0;
   padding: 14px 18px;
   border-radius: 18px;
-  border: 1px solid rgba(182, 191, 212, 0.12);
-  background: linear-gradient(180deg, rgba(29, 31, 39, 0.92), rgba(19, 21, 28, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.94);
   text-align: center;
 }
 
@@ -158,8 +158,8 @@ h1 {
   min-width: 0;
   padding: 16px 18px;
   border-radius: 18px;
-  border: 1px solid rgba(182, 191, 212, 0.12);
-  background: linear-gradient(180deg, rgba(29, 31, 39, 0.92), rgba(19, 21, 28, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.94);
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
@@ -198,9 +198,9 @@ h1 {
 .nav-button {
   width: 56px;
   height: 56px;
-  border: 1px solid rgba(182, 191, 212, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(40, 42, 50, 0.95), rgba(21, 23, 31, 0.95));
+  background: rgba(0, 0, 0, 0.95);
   color: var(--text);
   font-size: 30px;
   line-height: 1;
@@ -231,8 +231,8 @@ h1 {
 .slider-row {
   padding: 18px;
   border-radius: 18px;
-  border: 1px solid rgba(182, 191, 212, 0.12);
-  background: rgba(17, 19, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(0, 0, 0, 0.92);
 }
 
 .slider-head {
