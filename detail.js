@@ -35,7 +35,9 @@ const LEGEND_FONT_SIZE_TITLE = 24;
 const LEGEND_FONT_SIZE_LABEL = 18;
 const LEGEND_FONT_SIZE_VALUE = 17;
 const LEGEND_FLOWER_SIZE = 36;
-const TITLE_TO_SUBTEXT_GAP = 54;
+const HEADER_TITLE_TO_SUBTEXT_GAP = 54;
+const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
+const LEGEND_TITLE_TO_ROWS_GAP = 54;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
@@ -274,7 +276,7 @@ function drawHeader(country, latest, regimeInfo) {
   textStyle(NORMAL);
   textSize(FONT_SIZE_BODY);
   fill("#b6bfd4");
-  text("Jahr: " + latest.year, leftX + 2, leftY + TITLE_TO_SUBTEXT_GAP);
+  text("Jahr: " + latest.year, leftX + 2, leftY + HEADER_TITLE_TO_SUBTEXT_GAP);
 
   noStroke();
   fill("#98a1b7");
@@ -638,7 +640,7 @@ function drawLegend(latest) {
   const contentWidth = panelW - 36;
   const columnWidth = contentWidth / 2;
   const titlesY = panelY + 28;
-  const rowsStartY = titlesY + TITLE_TO_SUBTEXT_GAP;
+  const rowsStartY = titlesY + LEGEND_TITLE_TO_ROWS_GAP;
   const rowHeight = 48;
 
   drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
@@ -812,13 +814,8 @@ function drawInterpretationPanel(result) {
 
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(22);
-  text("Einordnung", panelX + 16, panelY + 14);
-
-  fill("#d4dbec");
-  textStyle(NORMAL);
-  textSize(21);
-  const interpretationBodyY = panelY + 14 + TITLE_TO_SUBTEXT_GAP;
+  textSize(28);
+  const interpretationBodyY = panelY + 14;
   text(
     result.interpretation,
     panelX + 16,
