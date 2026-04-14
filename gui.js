@@ -35,7 +35,7 @@ const nextCountryButton = document.getElementById("next-country");
 
 // Update connection status display
 function setConnectionStatus(connected) {
-  statusEl.textContent = connected ? "connected" : "disconnected";
+  statusEl.textContent = connected ? "verbunden" : "getrennt";
   statusEl.classList.toggle("connected", connected);
   statusEl.classList.toggle("disconnected", !connected);
 }
@@ -55,7 +55,7 @@ function syncSliders() {
 // direction: "prev", "next", or "none" - triggers slide animation
 function renderCountry(direction = "none") {
   if (countries.length === 0) {
-    countryNameEl.textContent = "No matching countries";
+    countryNameEl.textContent = "Keine passenden Länder";
     countryMetaEl.textContent = "0 / 0";
     prevCountryButton.disabled = true;
     nextCountryButton.disabled = true;
