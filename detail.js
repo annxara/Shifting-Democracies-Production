@@ -667,7 +667,7 @@ function drawLegend(latest) {
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_TITLE);
   text("Wissenschfliche Beurteilungen", startX, titlesY);
-  text("Volksempfinden", startX + 15 + columnWidth, titlesY);
+  text("Volksempfinden", startX + 50 + columnWidth, titlesY);
   textStyle(NORMAL);
 
   const rows = Math.max(vDemIndicators.length, essIndicators.length);
