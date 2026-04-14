@@ -147,7 +147,7 @@ class Node {
 
     // If there are matches globally but this country doesn't match, reduce opacity to 50%
     if (hasAnyMatch && !hasMatch) {
-      tint(255, 127); // 50% opacity (255 is full opacity, 127 is ~50%)
+      drawingContext.globalAlpha = 0.5;
     }
 
     let rectWidth = 300; // rectangle width
