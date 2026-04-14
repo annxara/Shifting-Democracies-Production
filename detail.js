@@ -43,8 +43,8 @@ const LEGEND_TITLE_TO_ROWS_GAP = 54;
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
   return ROTATE_CANVAS_90
-    ? { width: windowHeight, height: windowWidth }
-    : { width: windowWidth, height: windowHeight };
+    ? { width: 1080, height: 1920 }
+    : { width: 1920, height: 1080 };
 }
 
 // These values come from the control page.
