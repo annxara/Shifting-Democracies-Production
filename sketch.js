@@ -316,7 +316,7 @@ function drawLegend() {
   // Draw colored circles for data dimensions
   const vdemLabels = [
     "Elektorale Demokratie",
-    "Liberale  Demokratie",
+    "Liberale Demokratie",
     "Egalitäre Demokratie",
     "Deliberative Demokratie",
     "Partizipative Demokratie",
