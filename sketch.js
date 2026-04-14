@@ -217,10 +217,10 @@ function publishCountryState() {
 
 // Draw the legend box in the bottom right corner explaining the visualization elements
 function drawLegend() {
-  const legendX = width - 530;
-  const legendY = height - 190;
-  const legendW = 510;
-  const legendH = 185;
+  const legendX = width - 520;
+  const legendY = height - 165;
+  const legendW = 400;
+  const legendH = 160;
 
   // Background box
   fill(30);
@@ -235,12 +235,12 @@ function drawLegend() {
   textSize(16);
   textStyle(BOLD);
   textFont("Open Sans");
-  text("Legende", legendX + 15, legendY + 17);
+  text("Legende", legendX + 168, legendY + 17);
 
   // Example rectangle with divisions and colors
-  const exampleX = legendX + 15;
-  const exampleY = legendY + 30;
-  const exampleW = 480;
+  const exampleX = legendX + (legendW - 280) / 2; // Center horizontally
+  const exampleY = legendY + 25;
+  const exampleW = 280;
   const exampleH = 30;
   const sectionW = exampleW / 11; // Show 11 sections as example
 
@@ -286,30 +286,30 @@ function drawLegend() {
   textSize(11);
   textStyle(NORMAL);
   textFont("Open Sans");
-  text("1 Block = 1 Jahr ", legendX + 15, exampleY + 5 + exampleH + 11);
+  text("1 Block = 1 Jahr ", legendX + 10, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
   fill(130);
-  rect(legendX + 250, exampleY + 5 + exampleH + 3, 12, 10, 2);
+  rect(legendX + 180, exampleY + 5 + exampleH + 3, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
-  text("= Fehlende ESS-Daten", legendX + 265, exampleY + 5 + exampleH + 11);
+  text("= Fehlende ESS-Daten", legendX + 195, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
   fill("#E8FA5F");
-  rect(legendX + 15, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
-  text("= exakte Übereinstimmung", legendX + 30, exampleY + 5 + exampleH + 23);
+  text("= exakte Übereinstimmung", legendX + 25, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
   fill("#FFFECB");
-  rect(legendX + 250, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  rect(legendX + 180, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
   text(
-    "= nächstgelegenes Jahr zu den Parameteren",
-    legendX + 265,
+    "= nächstgelegenes Jahr zu\n   den Parameteren",
+    legendX + 195,
     exampleY + 5 + exampleH + 23,
   );
 
@@ -333,13 +333,13 @@ function drawLegend() {
 
   const circleRadius = 4;
   const circleSpacing = 18;
-  const columnSpacing = 220; // Wider spacing for 3 columns
+  const columnSpacing = 171; // Space between columns
 
   for (let i = 0; i < vdemLabels.length; i++) {
-    const column = i % 3;
-    const row = Math.floor(i / 3);
-    const circleX = legendX + 20 + column * columnSpacing;
-    const circleY = legendY + 80 + exampleH + row * circleSpacing;
+    const column = i % 2;
+    const row = Math.floor(i / 2);
+    const circleX = legendX + 15 + column * columnSpacing;
+    const circleY = legendY + 45 + exampleH + 35 + row * circleSpacing;
 
     // Draw circle
     fill(vdemColors[i]);
