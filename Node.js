@@ -136,6 +136,20 @@ class Node {
 
     push();
 
+    // Reduce opacity if there are global matches but this country doesn't match
+    let hasMatch = false;
+    for (const yearData of this.years) {
+      if (this.yearMatchesParams(yearData, params)) {
+        hasMatch = true;
+        break;
+      }
+    }
+
+    // If there are matches globally but this country doesn't match, reduce opacity to 50%
+    if (hasAnyMatch && !hasMatch) {
+      tint(255, 127); // 50% opacity (255 is full opacity, 127 is ~50%)
+    }
+
     let rectWidth = 300; // rectangle width
     let rectHeight = 60; // rectangle height
     let topOffset = 12; // Space above rectangle within its row
@@ -145,15 +159,6 @@ class Node {
     // Get closest year and calculate horizontal offset based on difference
     const { avgDifference } = this.getClosestYearAndDifference(params);
     const sectionWidth = (rectWidth * 0.99) / allYears.length;
-
-    // Check if any year matches params exactly
-    let hasMatch = false;
-    for (const yearData of this.years) {
-      if (this.yearMatchesParams(yearData, params)) {
-        hasMatch = true;
-        break;
-      }
-    }
 
     // Only apply offset if there's no matching year in this country
     // Non-matching countries shift based on how close they are to params
@@ -215,7 +220,7 @@ class Node {
         const isMatching = this.yearMatchesParams(yearData, params);
 
         // Full opacity for matching, reduced for non-matching
-        fill(255, isMatching ? 255 : 255);
+        fill(170);
 
         let radius = 0;
         if (i === 0) {
@@ -235,7 +240,7 @@ class Node {
       const yearData = yearMap[year];
       if (yearData && !this.hasSatisfactionData(yearData)) {
         const x = startX + i * sectionWidth;
-        fill(170);
+        fill(100);
 
         if (i === 0) {
           rect(x, startY, sectionWidth, lineH, corner, 0, 0, corner);
