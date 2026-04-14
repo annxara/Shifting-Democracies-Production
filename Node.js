@@ -305,7 +305,7 @@ class Node {
 
     fill(255);
     textAlign(CENTER);
-    textSize(12);
+    textSize(11);
     textFont("Open Sans");
     textStyle(NORMAL);
     text(this.country, 0, 40);
