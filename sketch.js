@@ -250,13 +250,13 @@ function drawLegend() {
 
     // Alternate between different colors for visual variety
     if (i === 0 || i === 10 || i === 1 || i === 7) {
-      fill(170); // End sections - gray (missing)
+      fill(130); // End sections - gray (missing)
     } else if (i === 5) {
       fill("#E8FA5F"); // Middle - yellow (matching highlight)
     } else if (i === 8) {
       fill("#FFFECB"); // Middle - lighter orange (matching highlight)
     } else {
-      fill(255); // Middle sections - white (matching)
+      fill(170); // Middle sections - white (matching)
     }
 
     // Draw with rounded corners on edges
@@ -299,7 +299,7 @@ function drawLegend() {
   text("1 Block = 1 Jahr ", legendX + 10, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
-  fill(170);
+  fill(130);
   rect(legendX + 137, exampleY + 5 + exampleH + 3, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
@@ -315,7 +315,7 @@ function drawLegend() {
   // Orange rectangle for closest year
   fill("#FFFECB");
   rect(legendX + 137, exampleY + 5 + exampleH + 15, 12, 10, 2);
-  fill(255);
+  fill(170);
   textFont("Open Sans");
   text(
     "= nächstgelegenes Jahr zu\n   den Parameteren",
