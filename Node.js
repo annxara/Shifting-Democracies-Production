@@ -217,7 +217,7 @@ class Node {
     // Draw highlighted border if this country is selected
     if (isSelected) {
       noFill();
-      stroke(255);
+      stroke("#E8FA5F");
       strokeWeight(3);
       rect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight, corner);
     }
