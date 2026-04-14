@@ -921,6 +921,7 @@ function drawNoMatchState() {
   noStroke();
   textAlign(CENTER, CENTER);
   textSize(FONT_SIZE_SECTION);
+  textStyle(BOLD);
   text(
     "Keine Länder entsprechen den aktuellen Parametern.",
     width / 2,
