@@ -24,8 +24,8 @@ const CLUSTER_MOVE_DURATION_MS = 4200;
 const HEADER_BLOCK_HEIGHT = 122;
 const INTERPRETATION_BLOCK_HEIGHT = 126;
 const INTERPRETATION_MARGIN_TOP = 12;
-const LEGEND_BLOCK_HEIGHT = 258;
-const LEGEND_MARGIN = 24;
+const LEGEND_BLOCK_HEIGHT = 312;
+const LEGEND_MARGIN = 34;
 const FLOWER_TO_LEGEND_GAP = 60;
 const BINARY_HIGH_THRESHOLD = 0.5;
 const FONT_SIZE_TITLE = 48;
@@ -134,12 +134,12 @@ const indicatorConfig = [
   {
     key: "stflife",
     label: "Zufriedenheit mit dem Leben",
-    image: "pictures/forgetmenot_yellow.png",
+    image: "pictures/forgetmenot_orange.png",
   },
   {
     key: "stfgov",
     label: "Zufriedenheit mit der Regierung",
-    image: "pictures/forgetmenot_orange.png",
+    image: "pictures/forgetmenot_yellow.png",
   },
 ];
 
