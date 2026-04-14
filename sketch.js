@@ -217,10 +217,10 @@ function publishCountryState() {
 
 // Draw the legend box in the bottom right corner explaining the visualization elements
 function drawLegend() {
-  const legendX = width - 470;
-  const legendY = height - 165;
-  const legendW = 300;
-  const legendH = 160;
+  const legendX = width - 530;
+  const legendY = height - 190;
+  const legendW = 510;
+  const legendH = 185;
 
   // Background box
   fill(30);
@@ -235,12 +235,12 @@ function drawLegend() {
   textSize(16);
   textStyle(BOLD);
   textFont("Open Sans");
-  text("Legende", legendX + 123, legendY + 17);
+  text("Legende", legendX + 15, legendY + 17);
 
   // Example rectangle with divisions and colors
-  const exampleX = legendX + 10;
-  const exampleY = legendY + 25;
-  const exampleW = 280;
+  const exampleX = legendX + 15;
+  const exampleY = legendY + 30;
+  const exampleW = 480;
   const exampleH = 30;
   const sectionW = exampleW / 11; // Show 11 sections as example
 
@@ -281,45 +281,35 @@ function drawLegend() {
     );
   }
 
-  // Draw sample data line across sections
-  // stroke(255, 100, 100);
-  // strokeWeight(1);
-  // line(
-  //   exampleX + sectionW * 0.5,
-  //   exampleY + 10,
-  //   exampleX + sectionW * 10.5,
-  //   exampleY + 10,
-  // );
-
   // Legend text (split into 2 rows)
   fill(255);
   textSize(11);
   textStyle(NORMAL);
   textFont("Open Sans");
-  text("1 Block = 1 Jahr ", legendX + 10, exampleY + 5 + exampleH + 11);
+  text("1 Block = 1 Jahr ", legendX + 15, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
   fill(130);
-  rect(legendX + 137, exampleY + 5 + exampleH + 3, 12, 10, 2);
+  rect(legendX + 250, exampleY + 5 + exampleH + 3, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
-  text("= Fehlende ESS-Daten", legendX + 152, exampleY + 5 + exampleH + 11);
+  text("= Fehlende ESS-Daten", legendX + 265, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
   fill("#E8FA5F");
-  rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  rect(legendX + 15, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
-  text("= exakte Übereinstimmung", legendX + 25, exampleY + 5 + exampleH + 23);
+  text("= exakte Übereinstimmung", legendX + 30, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
   fill("#FFFECB");
-  rect(legendX + 137, exampleY + 5 + exampleH + 15, 12, 10, 2);
-  fill(170);
+  rect(legendX + 250, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  fill(255);
   textFont("Open Sans");
   text(
-    "= nächstgelegenes Jahr zu\n   den Parameteren",
-    legendX + 152,
+    "= nächstgelegenes Jahr zu den Parameteren",
+    legendX + 265,
     exampleY + 5 + exampleH + 23,
   );
 
@@ -343,13 +333,13 @@ function drawLegend() {
 
   const circleRadius = 4;
   const circleSpacing = 18;
-  const columnSpacing = 128; // Space between columns
+  const columnSpacing = 220; // Wider spacing for 3 columns
 
   for (let i = 0; i < vdemLabels.length; i++) {
-    const column = i % 2;
-    const row = Math.floor(i / 2);
-    const circleX = legendX + 15 + column * columnSpacing;
-    const circleY = legendY + 45 + exampleH + 35 + row * circleSpacing;
+    const column = i % 3;
+    const row = Math.floor(i / 3);
+    const circleX = legendX + 20 + column * columnSpacing;
+    const circleY = legendY + 80 + exampleH + row * circleSpacing;
 
     // Draw circle
     fill(vdemColors[i]);
