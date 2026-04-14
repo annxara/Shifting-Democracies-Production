@@ -1020,6 +1020,7 @@ function emitCountryState() {
   if (!socket || filteredCountries.length === 0) {
     if (socket) {
       socket.emit("country-state", {
+        source: "detail",
         countries: [],
         activeCountry: "",
         activeIndex: 0,
@@ -1037,6 +1038,7 @@ function emitCountryState() {
   const currentYear = getSelectedHighlightedYearEntry(currentCountry);
 
   socket.emit("country-state", {
+    source: "detail",
     countries: filteredCountries.map((country) => country.country),
     activeCountry: currentCountry.country,
     activeIndex: countryIndex,

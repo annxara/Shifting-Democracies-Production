@@ -202,6 +202,7 @@ function publishCountryState() {
   }
 
   socket.emit("country-state", {
+    source: "sketch",
     countries: filteredCountries.map((country) => country.country),
     activeCountry: highlightedCountryName,
     activeIndex: countryIndex,

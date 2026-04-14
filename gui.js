@@ -118,13 +118,16 @@ function renderYear() {
 // Apply country state received from sketch via socket
 function applyCountryState(state, direction = "none") {
   countries = Array.isArray(state?.countries) ? state.countries : [];
-  activeYear = state?.activeYear ?? null;
-  activeYearIndex = Number.isFinite(Number(state?.activeYearIndex))
-    ? Number(state.activeYearIndex)
-    : 0;
-  totalYearCount = Number.isFinite(Number(state?.totalYearCount))
-    ? Number(state.totalYearCount)
-    : 0;
+
+  if (state?.source === "detail") {
+    activeYear = state?.activeYear ?? null;
+    activeYearIndex = Number.isFinite(Number(state?.activeYearIndex))
+      ? Number(state.activeYearIndex)
+      : 0;
+    totalYearCount = Number.isFinite(Number(state?.totalYearCount))
+      ? Number(state.totalYearCount)
+      : 0;
+  }
 
   if (countries.length === 0) {
     selectedCountryIndex = 0;
