@@ -91,7 +91,7 @@ const countryTranslations = {
   Sweden: "Schweden",
   Switzerland: "Schweiz",
   Ukraine: "Ukraine",
-  "United Kingdom": "Vereinigtes Königreich",
+  "United Kingdom": "UK",
 };
 
 // Each color belongs to one data variable.
