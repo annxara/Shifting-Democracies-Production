@@ -204,7 +204,7 @@ function windowResized() {
 
 function draw() {
   // Clear the screen each time it draws.
-  background("#101015");
+  background("#000000");
 
   // Show this while the data is loading.
   if (!countryData || countryData.length === 0) {
