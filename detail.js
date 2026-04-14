@@ -235,6 +235,9 @@ function draw() {
     return;
   }
 
+  const layout = getMainFrameLayout();
+  drawMainFrame(layout);
+
   // Rebuild the flower layout when the country changes.
   const currentKey = country.country + "-" + latest.year;
   if (currentKey !== flowerCloudKey) {
@@ -244,18 +247,68 @@ function draw() {
 
   const regimeInfo = getRegimeInterpretation(latest);
 
-  drawHeader(country, latest, regimeInfo);
-  drawInterpretationPanel(regimeInfo);
-  drawTree(latest);
-  drawLegend(latest);
+  drawHeader(country, latest, regimeInfo, layout);
+  drawInterpretationPanel(regimeInfo, layout);
+  drawTree(latest, layout);
+  drawLegend(latest, layout);
   //drawFooter();
 }
 
-function drawHeader(country, latest, regimeInfo) {
+function getMainFrameLayout() {
+  const frameX = LEGEND_MARGIN;
+  const frameY = LEGEND_MARGIN;
+  const frameW = width - LEGEND_MARGIN * 2;
+  const frameH = height - LEGEND_MARGIN * 2;
+  const contentPadding = 16;
+  const contentX = frameX + contentPadding;
+  const contentW = frameW - contentPadding * 2;
+  const headerY = frameY + 14;
+  const interpretationY = headerY + HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
+  const legendTop = frameY + frameH - LEGEND_BLOCK_HEIGHT;
+  const flowerTop = interpretationY + INTERPRETATION_BLOCK_HEIGHT + 24;
+  const flowerBottom = legendTop - FLOWER_TO_LEGEND_GAP;
+
+  return {
+    frameX,
+    frameY,
+    frameW,
+    frameH,
+    contentX,
+    contentW,
+    headerY,
+    interpretationY,
+    legendTop,
+    flowerTop,
+    flowerBottom,
+  };
+}
+
+function drawMainFrame(layout) {
+  drawUiPanel(
+    layout.frameX,
+    layout.frameY,
+    layout.frameW,
+    layout.frameH,
+    24,
+    "#000000",
+    "#ffffff",
+  );
+
+  stroke("#ffffff");
+  strokeWeight(1);
+  line(
+    layout.frameX + 14,
+    layout.legendTop,
+    layout.frameX + layout.frameW - 14,
+    layout.legendTop,
+  );
+}
+
+function drawHeader(country, latest, regimeInfo, layout) {
   // Structured top area: country/year on left, democracy type on right.
-  const panelX = 24;
-  const panelY = 20;
-  const panelW = width - 48;
+  const panelX = layout.contentX;
+  const panelY = layout.headerY;
+  const panelW = layout.contentW;
   const panelH = HEADER_BLOCK_HEIGHT;
   const panelPadding = 14;
 
@@ -268,7 +321,6 @@ function drawHeader(country, latest, regimeInfo) {
   const leftY = panelY + 14;
   const leftW = typeCardX - leftX - 16;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 20, "#000000", "#ffffff");
   drawUiPanel(typeCardX, typeCardY, typeCardW, typeCardH, 16, "#000000", "#ffffff");
 
   fill("#f7f9ff");
@@ -307,12 +359,12 @@ function drawHeader(country, latest, regimeInfo) {
   );
 }
 
-function drawTree(latest) {
+function drawTree(latest, layout) {
   // Instead of a strict tree, we now draw a drifting flower field.
   // The flowers behave like a soft cloud that moves over time.
 
   if (flowerCloud.length === 0) {
-    flowerCloud = buildMemoryField(latest);
+    flowerCloud = buildMemoryField(latest, layout);
     randomPhaseStartsAt = millis();
     clusterAnimationStartsAt = randomPhaseStartsAt + CLUSTER_DELAY_MS;
   }
@@ -320,7 +372,7 @@ function drawTree(latest) {
   updateAndDrawFlowers();
 }
 
-function buildMemoryField(latest) {
+function buildMemoryField(latest, layout) {
   // Create flowers that start at random positions, then settle into clusters.
 
   const flowers = [];
@@ -336,14 +388,10 @@ function buildMemoryField(latest) {
   );
 
   const bounds = {
-    minX: 70,
-    maxX: width - 70,
-    minY:
-      HEADER_BLOCK_HEIGHT +
-      INTERPRETATION_MARGIN_TOP +
-      INTERPRETATION_BLOCK_HEIGHT +
-      28,
-    maxY: height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN - FLOWER_TO_LEGEND_GAP,
+    minX: layout.contentX + 14,
+    maxX: layout.contentX + layout.contentW - 14,
+    minY: layout.flowerTop,
+    maxY: Math.max(layout.flowerTop + 40, layout.flowerBottom),
   };
 
   // Build evenly spaced anchors for all indicators inside the flower area.
@@ -633,7 +681,7 @@ function isEssDataAvailable(latest, indicatorKey) {
   return Number.isFinite(numericValue);
 }
 
-function drawLegend(latest) {
+function drawLegend(latest, layout) {
   // Show V-Dem indicators on the left and ESS indicators on the right.
   const vDemIndicators = indicatorConfig.filter((item) =>
     item.key.startsWith("v2x_"),
@@ -642,11 +690,10 @@ function drawLegend(latest) {
     item.key.startsWith("stf"),
   );
 
-  const panelX = 24;
-
-  const panelY = height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN;
-  const panelW = width - 48;
-  const panelH = LEGEND_BLOCK_HEIGHT;
+  const panelX = layout.contentX;
+  const panelY = layout.legendTop + 8;
+  const panelW = layout.contentW;
+  const panelH = layout.frameY + layout.frameH - panelY - 10;
   const startX = panelX + 18;
   const contentWidth = panelW - 36;
   const columnWidth = contentWidth / 2;
@@ -655,8 +702,6 @@ function drawLegend(latest) {
   const maxRows = Math.max(vDemIndicators.length, essIndicators.length);
   const availableRowsHeight = panelH - (rowsStartY - panelY) - 16;
   const rowHeight = Math.max(28, availableRowsHeight / Math.max(1, maxRows));
-
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#000000", "#ffffff");
 
   stroke("#2f3850");
   strokeWeight(1);
@@ -816,13 +861,12 @@ function getRegimeInterpretation(latest) {
   };
 }
 
-function drawInterpretationPanel(result) {
-  const panelX = 24;
-  const panelY = HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
-  const panelW = width - 48;
+function drawInterpretationPanel(result, layout) {
+  const panelX = layout.contentX;
+  const panelY = layout.interpretationY;
+  const panelW = layout.contentW;
   const panelH = INTERPRETATION_BLOCK_HEIGHT;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#000000", "#ffffff");
   noStroke();
   textAlign(LEFT, TOP);
 
@@ -910,12 +954,12 @@ function drawLoadingState() {
 
 function drawNoMatchState() {
   // Message when no country fits the filter values.
-  const panelW = Math.min(width - 80, 760);
-  const panelH = 250;
-  const panelX = (width - panelW) / 2;
-  const panelY = (height - panelH) / 2 - 28;
+  const layout = getMainFrameLayout();
+  drawMainFrame(layout);
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 20, "#000000", "#ffffff");
+  const panelX = layout.contentX;
+  const panelW = layout.contentW;
+  const panelY = layout.frameY + 58;
 
   fill(220);
   noStroke();
@@ -925,14 +969,14 @@ function drawNoMatchState() {
   text(
     "Keine Länder entsprechen den aktuellen Parametern.",
     width / 2,
-    panelY + 58,
+    panelY,
   );
 
   textSize(16);
   fill("#b8bcc8");
   textAlign(CENTER, TOP);
   const lineHeight = 28;
-  const startY = panelY + 106;
+  const startY = panelY + 54;
 
   text(
     "Zufriedenheit mit der Wirtschaft: " + params.stfeco,
