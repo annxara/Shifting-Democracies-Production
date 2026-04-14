@@ -901,7 +901,7 @@ function drawNoMatchState() {
   textAlign(CENTER, CENTER);
   textSize(FONT_SIZE_SECTION);
   text(
-    "Keine Laender entsprechen den aktuellen Parametern.",
+    "Keine Länder entsprechen den aktuellen Parametern.",
     width / 2,
     height / 2 - 24,
   );
@@ -909,11 +909,11 @@ function drawNoMatchState() {
   textSize(FONT_SIZE_BODY);
   fill("#b8bcc8");
   text(
-    "stfeco: " +
+    "Zufriedenheit mit der Wirtschaft: " +
       params.stfeco +
-      " | stflife: " +
+      " | Zufriedenheit mit dem Leben: " +
       params.stflife +
-      " | stfgov: " +
+      " | Zufriedenheit mit der Regierung: " +
       params.stfgov,
     width / 2,
     height / 2 + 20,
