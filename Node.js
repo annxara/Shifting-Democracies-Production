@@ -322,7 +322,7 @@ class Node {
         const x = startX + i * sectionWidth + sectionWidth / 2;
         fill(255);
         textAlign(CENTER);
-        textSize(11);
+        textSize(10);
         textFont("Open Sans");
         text(year, x, startY - 5);
       }
@@ -339,7 +339,7 @@ class Node {
             const x = startX + i * sectionWidth + sectionWidth / 2;
             fill(255);
             textAlign(CENTER);
-            textSize(11);
+            textSize(10);
             textFont("Open Sans");
             text(closestYearValue, x, startY - 5);
             break;
