@@ -871,8 +871,8 @@ function drawInterpretationPanel(result, layout) {
   textAlign(LEFT, TOP);
 
   fill("#e8ecf8");
-  textStyle(NORMAL);
-  textSize(16);
+  textStyle(BOLD);
+  textSize(18);
   const interpretationBodyY = panelY + 16;
   text(
     result.interpretation,
@@ -954,12 +954,12 @@ function drawLoadingState() {
 
 function drawNoMatchState() {
   // Message when no country fits the filter values.
-  const layout = getMainFrameLayout();
-  drawMainFrame(layout);
+  const panelW = Math.min(width - 80, 760);
+  const panelH = 250;
+  const panelX = (width - panelW) / 2;
+  const panelY = (height - panelH) / 2 - 28;
 
-  const panelX = layout.contentX;
-  const panelW = layout.contentW;
-  const panelY = layout.frameY + 58;
+  drawUiPanel(panelX, panelY, panelW, panelH, 20, "#000000", "#ffffff");
 
   fill(220);
   noStroke();
@@ -969,14 +969,14 @@ function drawNoMatchState() {
   text(
     "Keine Länder entsprechen den aktuellen Parametern.",
     width / 2,
-    panelY,
+    panelY + 58,
   );
 
   textSize(16);
   fill("#b8bcc8");
   textAlign(CENTER, TOP);
   const lineHeight = 28;
-  const startY = panelY + 54;
+  const startY = panelY + 106;
 
   text(
     "Zufriedenheit mit der Wirtschaft: " + params.stfeco,
