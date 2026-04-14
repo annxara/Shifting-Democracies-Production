@@ -117,6 +117,11 @@ const indicatorConfig = [
     image: "pictures/forgetmenot_brightpurple.png",
   },
   {
+    key: "v2x_egaldem",
+    label: "Egalitäre Demokratie",
+    image: "pictures/forgetmenot_toxicyellow.png",
+  },
+  {
     key: "stfdem",
     label: "Zufriedenheit mit Demokratie",
     image: "pictures/forgetmenot_magenta.png",
@@ -124,12 +129,12 @@ const indicatorConfig = [
   {
     key: "stfeco",
     label: "Zufriedenheit mit der Wirtschaft",
-    image: "pictures/forgetmenot_babyblue.png",
+    image: "pictures/forgetmenot_red.png",
   },
   {
     key: "stflife",
     label: "Zufriedenheit mit dem Leben",
-    image: "pictures/forgetmenot_magenta.png",
+    image: "pictures/forgetmenot_yellow.png",
   },
   {
     key: "stfgov",
