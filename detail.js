@@ -914,15 +914,24 @@ function drawNoMatchState() {
 
   textSize(18);
   fill("#b8bcc8");
+  textAlign(CENTER, TOP);
+  const lineHeight = 24;
+  const startY = height / 2 + 20;
+
   text(
-    "Zufriedenheit mit der Wirtschaft: " +
-      params.stfeco +
-      " | Zufriedenheit mit dem Leben: " +
-      params.stflife +
-      " | Zufriedenheit mit der Regierung: " +
-      params.stfgov,
+    "Zufriedenheit mit der Wirtschaft: " + params.stfeco,
     width / 2,
-    height / 2 + 20,
+    startY,
+  );
+  text(
+    "Zufriedenheit mit dem Leben: " + params.stflife,
+    width / 2,
+    startY + lineHeight,
+  );
+  text(
+    "Zufriedenheit mit der Regierung: " + params.stfgov,
+    width / 2,
+    startY + lineHeight * 2,
   );
 }
 
