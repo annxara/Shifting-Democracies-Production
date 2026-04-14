@@ -219,7 +219,7 @@ function publishCountryState() {
 function drawLegend() {
   const legendX = width - 520;
   const legendY = height - 165;
-  const legendW = 400;
+  const legendW = 380;
   const legendH = 160;
 
   // Background box
@@ -286,30 +286,30 @@ function drawLegend() {
   textSize(11);
   textStyle(NORMAL);
   textFont("Open Sans");
-  text("1 Block = 1 Jahr ", legendX + 10, exampleY + 5 + exampleH + 11);
+  text("1 Block = 1 Jahr ", legendX + 30, exampleY + 5 + exampleH + 11);
 
   // Gray rectangle for missing data
   fill(130);
-  rect(legendX + 180, exampleY + 5 + exampleH + 3, 12, 10, 2);
+  rect(legendX + 190, exampleY + 5 + exampleH + 3, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
-  text("= Fehlende ESS-Daten", legendX + 195, exampleY + 5 + exampleH + 11);
+  text("= Fehlende ESS-Daten", legendX + 205, exampleY + 5 + exampleH + 11);
 
   // Yellow rectangle for exact match
   fill("#E8FA5F");
-  rect(legendX + 10, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  rect(legendX + 30, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
-  text("= exakte Übereinstimmung", legendX + 25, exampleY + 5 + exampleH + 23);
+  text("= exakte Übereinstimmung", legendX + 45, exampleY + 5 + exampleH + 23);
 
   // Orange rectangle for closest year
   fill("#FFFECB");
-  rect(legendX + 180, exampleY + 5 + exampleH + 15, 12, 10, 2);
+  rect(legendX + 190, exampleY + 5 + exampleH + 15, 12, 10, 2);
   fill(255);
   textFont("Open Sans");
   text(
     "= nächstgelegenes Jahr zu\n   den Parameteren",
-    legendX + 195,
+    legendX + 205,
     exampleY + 5 + exampleH + 23,
   );
 
@@ -333,12 +333,12 @@ function drawLegend() {
 
   const circleRadius = 4;
   const circleSpacing = 18;
-  const columnSpacing = 171; // Space between columns
+  const columnSpacing = 161; // Space between columns
 
   for (let i = 0; i < vdemLabels.length; i++) {
     const column = i % 2;
     const row = Math.floor(i / 2);
-    const circleX = legendX + 15 + column * columnSpacing;
+    const circleX = legendX + 35 + column * columnSpacing;
     const circleY = legendY + 45 + exampleH + 35 + row * circleSpacing;
 
     // Draw circle
