@@ -35,6 +35,7 @@ const LEGEND_FONT_SIZE_TITLE = 24;
 const LEGEND_FONT_SIZE_LABEL = 18;
 const LEGEND_FONT_SIZE_VALUE = 17;
 const LEGEND_FLOWER_SIZE = 38;
+const FLOWER_RENDER_SCALE = 1.12;
 const HEADER_TITLE_TO_SUBTEXT_GAP = 59;
 const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
 const LEGEND_TITLE_TO_ROWS_GAP = 54;
@@ -572,7 +573,7 @@ function drawSingleFlower(f) {
     1,
   );
   const smoothGrow = growProgress * growProgress * (3 - 2 * growProgress);
-  const drawSize = f.size * smoothGrow;
+  const drawSize = f.size * smoothGrow * FLOWER_RENDER_SCALE;
 
   if (drawSize <= 0.5) return;
 
