@@ -249,8 +249,6 @@ function drawHeader(country, latest, regimeInfo) {
   const panelH = HEADER_BLOCK_HEIGHT;
   const panelPadding = 16;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
-
   const typeCardW = Math.min(390, panelW * 0.42);
   const typeCardX = panelX + panelW - typeCardW - panelPadding;
   const typeCardY = panelY + panelPadding;
@@ -277,11 +275,6 @@ function drawHeader(country, latest, regimeInfo) {
   textSize(FONT_SIZE_BODY);
   fill("#b6bfd4");
   text("Jahr: " + latest.year, leftX + 2, leftY + TITLE_TO_SUBTEXT_GAP);
-
-  stroke("#3b3d49");
-  strokeWeight(1);
-  fill("#151821");
-  rect(typeCardX, typeCardY, typeCardW, typeCardH, 14);
 
   noStroke();
   fill("#98a1b7");
@@ -813,8 +806,6 @@ function drawInterpretationPanel(result) {
   const panelY = HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
   const panelW = width - 48;
   const panelH = INTERPRETATION_BLOCK_HEIGHT;
-
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
 
   noStroke();
   textAlign(LEFT, TOP);
