@@ -109,16 +109,49 @@ h1 {
 
 .year-panel {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 56px minmax(0, 1fr) 56px;
   gap: 14px;
+  align-items: center;
   margin-bottom: 20px;
+  padding: 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(182, 191, 212, 0.14);
+  background: rgba(16, 17, 22, 0.7);
 }
 
 .year-panel .nav-button {
-  width: 100%;
-  height: 48px;
-  font-size: 16px;
-  font-weight: 600;
+  width: 56px;
+  height: 56px;
+}
+
+.year-display {
+  min-width: 0;
+  padding: 14px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(182, 191, 212, 0.12);
+  background: linear-gradient(180deg, rgba(29, 31, 39, 0.92), rgba(19, 21, 28, 0.92));
+  text-align: center;
+}
+
+.year-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted-soft);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.year-name {
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.year-meta {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .country-display {

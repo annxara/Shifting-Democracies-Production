@@ -232,35 +232,72 @@ function draw() {
     flowerCloud = [];
   }
 
-  drawHeader(country, latest);
-  drawInterpretationPanel(latest);
+  const regimeInfo = getRegimeInterpretation(latest);
+
+  drawHeader(country, latest, regimeInfo);
+  drawInterpretationPanel(regimeInfo);
   drawTree(latest);
   drawLegend(latest);
   //drawFooter();
 }
 
-function drawHeader(country, latest) {
-  // Styled header panel with stronger title hierarchy.
+function drawHeader(country, latest, regimeInfo) {
+  // Structured top area: country/year on left, democracy type on right.
   const panelX = 24;
   const panelY = 20;
   const panelW = width - 48;
-  const panelH = HEADER_BLOCK_HEIGHT - 26;
+  const panelH = HEADER_BLOCK_HEIGHT;
+  const panelPadding = 16;
+
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
+
+  const typeCardW = Math.min(390, panelW * 0.42);
+  const typeCardX = panelX + panelW - typeCardW - panelPadding;
+  const typeCardY = panelY + panelPadding;
+  const typeCardH = panelH - panelPadding * 2;
+
+  const leftX = panelX + 22;
+  const leftY = panelY + 14;
+  const leftW = typeCardX - leftX - 16;
 
   fill("#f7f9ff");
   noStroke();
   textAlign(LEFT, TOP);
   textStyle(BOLD);
 
-  textSize(FONT_SIZE_TITLE);
-  text(country.country, panelX + 22, panelY + 16);
+  let titleSize = FONT_SIZE_TITLE;
+  while (titleSize > 38 && textWidth(country.country) > leftW) {
+    titleSize -= 2;
+    textSize(titleSize);
+  }
+  textSize(titleSize);
+  text(country.country, leftX, leftY);
 
   textStyle(NORMAL);
   textSize(FONT_SIZE_BODY);
   fill("#b6bfd4");
+  text("Jahr: " + latest.year, leftX + 2, leftY + TITLE_TO_SUBTEXT_GAP);
+
+  stroke("#3b3d49");
+  strokeWeight(1);
+  fill("#151821");
+  rect(typeCardX, typeCardY, typeCardW, typeCardH, 14);
+
+  noStroke();
+  fill("#98a1b7");
+  textStyle(NORMAL);
+  textSize(16);
+  text("Demokratietyp", typeCardX + 14, typeCardY + 12);
+
+  fill("#f1f5ff");
+  textStyle(BOLD);
+  textSize(24);
   text(
-    "Jahr: " + latest.year,
-    panelX + 24,
-    panelY + 16 + TITLE_TO_SUBTEXT_GAP,
+    regimeInfo.regimeType,
+    typeCardX + 14,
+    typeCardY + 34,
+    typeCardW - 28,
+    typeCardH - 40,
   );
 }
 
@@ -771,25 +808,26 @@ function getRegimeInterpretation(latest) {
   };
 }
 
-function drawInterpretationPanel(latest) {
-  const result = getRegimeInterpretation(latest);
+function drawInterpretationPanel(result) {
   const panelX = 24;
   const panelY = HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
   const panelW = width - 48;
   const panelH = INTERPRETATION_BLOCK_HEIGHT;
+
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
 
   noStroke();
   textAlign(LEFT, TOP);
 
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(FONT_SIZE_SECTION);
-  text(result.regimeType, panelX + 16, panelY + 18);
+  textSize(22);
+  text("Einordnung", panelX + 16, panelY + 14);
 
   fill("#d4dbec");
   textStyle(NORMAL);
-  textSize(FONT_SIZE_BODY);
-  const interpretationBodyY = panelY + 18 + TITLE_TO_SUBTEXT_GAP;
+  textSize(21);
+  const interpretationBodyY = panelY + 14 + TITLE_TO_SUBTEXT_GAP;
   text(
     result.interpretation,
     panelX + 16,
