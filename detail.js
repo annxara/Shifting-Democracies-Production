@@ -35,7 +35,7 @@ const LEGEND_FONT_SIZE_TITLE = 24;
 const LEGEND_FONT_SIZE_LABEL = 18;
 const LEGEND_FONT_SIZE_VALUE = 17;
 const LEGEND_FLOWER_SIZE = 36;
-const HEADER_TITLE_TO_SUBTEXT_GAP = 54;
+const HEADER_TITLE_TO_SUBTEXT_GAP = 59;
 const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
 const LEGEND_TITLE_TO_ROWS_GAP = 54;
 
@@ -204,7 +204,7 @@ function windowResized() {
 
 function draw() {
   // Clear the screen each time it draws.
-  background("#101015");
+  background("#000000");
 
   // Show this while the data is loading.
   if (!countryData || countryData.length === 0) {
@@ -643,7 +643,7 @@ function drawLegend(latest) {
   const rowsStartY = titlesY + LEGEND_TITLE_TO_ROWS_GAP;
   const rowHeight = 48;
 
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#202127dd", "#444652");
+  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#000000", "#ffffff");
 
   stroke("#2f3850");
   strokeWeight(1);
@@ -901,19 +901,19 @@ function drawNoMatchState() {
   textAlign(CENTER, CENTER);
   textSize(FONT_SIZE_SECTION);
   text(
-    "Keine Laender entsprechen den aktuellen Parametern.",
+    "Keine Länder entsprechen den aktuellen Parametern.",
     width / 2,
     height / 2 - 24,
   );
 
-  textSize(FONT_SIZE_BODY);
+  textSize(18);
   fill("#b8bcc8");
   text(
-    "stfeco: " +
+    "Zufriedenheit mit der Wirtschaft: " +
       params.stfeco +
-      " | stflife: " +
+      " | Zufriedenheit mit dem Leben: " +
       params.stflife +
-      " | stfgov: " +
+      " | Zufriedenheit mit der Regierung: " +
       params.stfgov,
     width / 2,
     height / 2 + 20,
