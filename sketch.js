@@ -325,7 +325,7 @@ function drawLegend() {
   const vdemColors = [
     "#00D9FF", // v2x_polyarchy - bright cyan
     "#4B0082", // v2x_libdem - indigo (deep)
-    "#00B4A6", // v2x_egaldem - teal
+    "#a5f7e0", // v2x_egaldem - teal
     "#8B3DFF", // v2x_delibdem - bright purple
     "#1E90FF", // v2x_partipdem - dodger blue
     "#FF00F2", // stfdem - magenta
@@ -395,3 +395,6 @@ function connectSocket() {
     }
   });
 }
+
+
+hello
