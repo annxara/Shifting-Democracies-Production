@@ -397,4 +397,3 @@ function connectSocket() {
 }
 
 
-hello
