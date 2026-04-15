@@ -182,7 +182,7 @@ function setup() {
   }
   imageMode(CENTER);
   angleMode(DEGREES);
-  textFont("Open Sans");
+  textFont("Open Sauce One");
 
   // Make the data ready to use.
   countryData = toCountryArray(countryData);
@@ -212,7 +212,7 @@ function windowResized() {
 function draw() {
   // Clear the screen each time it draws.
   background("#000000");
-  textFont("Open Sans");
+  textFont("Open Sauce One");
 
   // Show this while the data is loading.
   if (!countryData || countryData.length === 0) {
