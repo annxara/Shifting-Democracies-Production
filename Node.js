@@ -198,7 +198,7 @@ class Node {
       "stfdem",
     ];
     const vdemColors = [
-      "#00D9FF", // v2x_polyarchy - bright cyan
+      "#2755ca", // v2x_polyarchy - bright cyan
       "#4B0082", // v2x_libdem - indigo (deep)
       "#00B4A6", // v2x_egaldem - teal
       "#8B3DFF", // v2x_delibdem - bright purple
