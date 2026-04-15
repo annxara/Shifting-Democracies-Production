@@ -314,7 +314,7 @@ class Node {
     fill(255);
     textAlign(CENTER);
     textSize(11);
-    textFont("Open Sauce One");
+    textFont("Open Sans");
     textStyle(NORMAL);
     text(this.country, 0, 40);
 
@@ -331,7 +331,7 @@ class Node {
         fill(255);
         textAlign(CENTER);
         textSize(10);
-        textFont("Open Sauce One");
+        textFont("Open Sans");
         text(year, x, startY - 5);
       }
     }
@@ -348,7 +348,7 @@ class Node {
             fill(255);
             textAlign(CENTER);
             textSize(10);
-            textFont("Open Sauce One");
+            textFont("Open Sans");
             text(closestYearValue, x, startY - 5);
             break;
           }
