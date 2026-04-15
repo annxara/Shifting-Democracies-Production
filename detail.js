@@ -120,7 +120,7 @@ const indicatorConfig = [
   {
     key: "v2x_egaldem",
     label: "Egalitäre Demokratie",
-    image: "pictures/forgetmenot_teal.png",
+    image: "pictures/forgetmenot_egaldem.png",
   },
   {
     key: "stfdem",
