@@ -105,12 +105,12 @@ const indicatorConfig = [
   {
     key: "v2x_polyarchy",
     label: "Elektorale Demokratie",
-    image: "pictures/forgetmenot_brightcyan.png",
+    image: "pictures/forgetmenot_polyarchy.png",
   },
   {
     key: "v2x_partipdem",
     label: "Partizipative Demokratie",
-    image: "pictures/forgetmenot_dodgerblue.png",
+    image: "pictures/forgetmenot_partipdem.png",
   },
   {
     key: "v2x_delibdem",
@@ -120,7 +120,7 @@ const indicatorConfig = [
   {
     key: "v2x_egaldem",
     label: "Egalitäre Demokratie",
-    image: "pictures/forgetmenot_teal.png",
+    image: "pictures/forgetmenot_egaldem.png",
   },
   {
     key: "stfdem",
