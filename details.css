@@ -1,5 +1,5 @@
-/* Google Fonts: Open Sans */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+/* Google Fonts: Open Sauce One */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sauce+One:wght@400;600;700&display=swap');
 
 html, body {
   margin: 0;
@@ -8,7 +8,7 @@ html, body {
   height: 100%;
   background: #0c0f17;
   color: #f7f7f7;
-  font-family: 'Open Sans', sans-serif;
+  font-family: 'Open Sauce One', sans-serif;
 }
 
 body {

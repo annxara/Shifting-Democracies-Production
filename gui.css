@@ -1,4 +1,4 @@
-/* Google Fonts: Open Sans */
+/* Google Fonts: Open Sauce One */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
 
 :root {
@@ -24,7 +24,7 @@ body {
     radial-gradient(circle at top, rgba(91, 98, 120, 0.18), transparent 42%),
     linear-gradient(180deg, #0b0d13 0%, #101015 100%);
   color: var(--text);
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Open Sauce One", sans-serif;
 }
 
 body {
