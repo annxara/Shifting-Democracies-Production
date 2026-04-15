@@ -21,30 +21,30 @@ let clusterAnimationStartsAt = 0;
 const ROTATE_CANVAS_90 = true;
 const CLUSTER_DELAY_MS = 2000;
 const CLUSTER_MOVE_DURATION_MS = 4200;
-const HEADER_BLOCK_HEIGHT = 122;
-const INTERPRETATION_BLOCK_HEIGHT = 126;
+const HEADER_BLOCK_HEIGHT = 108;
+const INTERPRETATION_BLOCK_HEIGHT = 98;
 const INTERPRETATION_MARGIN_TOP = 12;
-const LEGEND_BLOCK_HEIGHT = 312;
+const LEGEND_BLOCK_HEIGHT = 272;
 const LEGEND_MARGIN = 34;
 const FLOWER_TO_LEGEND_GAP = 60;
 const BINARY_HIGH_THRESHOLD = 0.5;
-const FONT_SIZE_TITLE = 48;
-const FONT_SIZE_SECTION = 30;
-const FONT_SIZE_BODY = 24;
-const LEGEND_FONT_SIZE_TITLE = 24;
-const LEGEND_FONT_SIZE_LABEL = 18;
-const LEGEND_FONT_SIZE_VALUE = 17;
-const LEGEND_FLOWER_SIZE = 38;
+const FONT_SIZE_TITLE = 36;
+const FONT_SIZE_SECTION = 24;
+const FONT_SIZE_BODY = 17;
+const LEGEND_FONT_SIZE_TITLE = 20;
+const LEGEND_FONT_SIZE_LABEL = 15;
+const LEGEND_FONT_SIZE_VALUE = 14;
+const LEGEND_FLOWER_SIZE = 28;
 const FLOWER_RENDER_SCALE = 1.52;
-const HEADER_TITLE_TO_SUBTEXT_GAP = 59;
+const HEADER_TITLE_TO_SUBTEXT_GAP = 46;
 const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
-const LEGEND_TITLE_TO_ROWS_GAP = 54;
+const LEGEND_TITLE_TO_ROWS_GAP = 42;
 
 function getCanvasSize() {
   // If the canvas is rotated by 90deg, swap dimensions so it still fits the window.
   return ROTATE_CANVAS_90
-    ? { width: 1080, height: 1920 }
-    : { width: 1920, height: 1080 };
+    ? { width: 720, height: 1280 }
+    : { width: 1280, height: 720 };
 }
 
 // These values come from the control page.
@@ -182,6 +182,7 @@ function setup() {
   }
   imageMode(CENTER);
   angleMode(DEGREES);
+  textFont("Open Sans");
 
   // Make the data ready to use.
   countryData = toCountryArray(countryData);
@@ -211,6 +212,7 @@ function windowResized() {
 function draw() {
   // Clear the screen each time it draws.
   background("#000000");
+  textFont("Open Sans");
 
   // Show this while the data is loading.
   if (!countryData || countryData.length === 0) {
@@ -233,6 +235,9 @@ function draw() {
     return;
   }
 
+  const layout = getMainFrameLayout();
+  drawMainFrame(layout);
+
   // Rebuild the flower layout when the country changes.
   const currentKey = country.country + "-" + latest.year;
   if (currentKey !== flowerCloudKey) {
@@ -242,20 +247,70 @@ function draw() {
 
   const regimeInfo = getRegimeInterpretation(latest);
 
-  drawHeader(country, latest, regimeInfo);
-  drawInterpretationPanel(regimeInfo);
-  drawTree(latest);
-  drawLegend(latest);
+  drawHeader(country, latest, regimeInfo, layout);
+  drawInterpretationPanel(regimeInfo, layout);
+  drawTree(latest, layout);
+  drawLegend(latest, layout);
   //drawFooter();
 }
 
-function drawHeader(country, latest, regimeInfo) {
-  // Structured top area: country/year on left, democracy type on right.
-  const panelX = 24;
-  const panelY = 20;
-  const panelW = width - 48;
+function getMainFrameLayout() {
+  const frameX = LEGEND_MARGIN;
+  const frameY = LEGEND_MARGIN;
+  const frameW = width - LEGEND_MARGIN * 2;
+  const frameH = height - LEGEND_MARGIN * 2;
+  const contentPadding = 16;
+  const contentX = frameX + contentPadding;
+  const contentW = frameW - contentPadding * 2;
+  const headerY = frameY + 14;
+  const interpretationY = headerY + HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
+  const legendTop = frameY + frameH - LEGEND_BLOCK_HEIGHT;
+  const flowerTop = interpretationY + INTERPRETATION_BLOCK_HEIGHT + 24;
+  const flowerBottom = legendTop - FLOWER_TO_LEGEND_GAP;
+
+  return {
+    frameX,
+    frameY,
+    frameW,
+    frameH,
+    contentX,
+    contentW,
+    headerY,
+    interpretationY,
+    legendTop,
+    flowerTop,
+    flowerBottom,
+  };
+}
+
+function drawMainFrame(layout) {
+  drawUiPanel(
+    layout.frameX,
+    layout.frameY,
+    layout.frameW,
+    layout.frameH,
+    24,
+    "#000000",
+    "#ffffff",
+  );
+
+  stroke("#ffffff");
+  strokeWeight(1);
+  line(
+    layout.frameX + 14,
+    layout.legendTop,
+    layout.frameX + layout.frameW - 14,
+    layout.legendTop,
+  );
+}
+
+function drawHeader(country, latest, regimeInfo, layout) {
+  // Structured top area with shared rows: country + type label, year + type value.
+  const panelX = layout.contentX;
+  const panelY = layout.headerY;
+  const panelW = layout.contentW;
   const panelH = HEADER_BLOCK_HEIGHT;
-  const panelPadding = 16;
+  const panelPadding = 14;
 
   const typeCardW = Math.min(390, panelW * 0.42);
   const typeCardX = panelX + panelW - typeCardW - panelPadding;
@@ -265,6 +320,11 @@ function drawHeader(country, latest, regimeInfo) {
   const leftX = panelX + 22;
   const leftY = panelY + 14;
   const leftW = typeCardX - leftX - 16;
+  const rightX = typeCardX + 14;
+  const rowTopY = leftY;
+  const rowBottomY = leftY + HEADER_TITLE_TO_SUBTEXT_GAP - 2;
+
+  drawUiPanel(typeCardX, typeCardY, typeCardW, typeCardH, 16, "#000000", "#ffffff");
 
   fill("#f7f9ff");
   noStroke();
@@ -272,42 +332,44 @@ function drawHeader(country, latest, regimeInfo) {
   textStyle(BOLD);
 
   let titleSize = FONT_SIZE_TITLE;
-  while (titleSize > 38 && textWidth(country.country) > leftW) {
+  while (titleSize > 28 && textWidth(country.country) > leftW) {
     titleSize -= 2;
     textSize(titleSize);
   }
   textSize(titleSize);
-  text(country.country, leftX, leftY);
-
-  textStyle(NORMAL);
-  textSize(FONT_SIZE_BODY);
-  fill("#b6bfd4");
-  text("Jahr: " + latest.year, leftX + 2, leftY + HEADER_TITLE_TO_SUBTEXT_GAP);
+  text(country.country, leftX, rowTopY);
 
   noStroke();
   fill("#98a1b7");
   textStyle(NORMAL);
-  textSize(16);
-  text("Demokratietyp", typeCardX + 14, typeCardY + 12);
+  const typeLabelSize = 13;
+  textSize(typeLabelSize);
+  const typeLabelY = rowTopY + Math.max(0, titleSize - typeLabelSize);
+  text("Demokratietyp", rightX, typeLabelY);
+
+  textStyle(NORMAL);
+  textSize(FONT_SIZE_BODY);
+  fill("#b6bfd4");
+  text("Jahr: " + latest.year, leftX + 2, rowBottomY);
 
   fill("#f1f5ff");
   textStyle(BOLD);
-  textSize(24);
+  textSize(18);
   text(
     regimeInfo.regimeType,
-    typeCardX + 14,
-    typeCardY + 34,
+    rightX,
+    rowBottomY,
     typeCardW - 28,
-    typeCardH - 40,
+    typeCardH - (rowBottomY - typeCardY),
   );
 }
 
-function drawTree(latest) {
+function drawTree(latest, layout) {
   // Instead of a strict tree, we now draw a drifting flower field.
   // The flowers behave like a soft cloud that moves over time.
 
   if (flowerCloud.length === 0) {
-    flowerCloud = buildMemoryField(latest);
+    flowerCloud = buildMemoryField(latest, layout);
     randomPhaseStartsAt = millis();
     clusterAnimationStartsAt = randomPhaseStartsAt + CLUSTER_DELAY_MS;
   }
@@ -315,7 +377,7 @@ function drawTree(latest) {
   updateAndDrawFlowers();
 }
 
-function buildMemoryField(latest) {
+function buildMemoryField(latest, layout) {
   // Create flowers that start at random positions, then settle into clusters.
 
   const flowers = [];
@@ -331,14 +393,10 @@ function buildMemoryField(latest) {
   );
 
   const bounds = {
-    minX: 70,
-    maxX: width - 70,
-    minY:
-      HEADER_BLOCK_HEIGHT +
-      INTERPRETATION_MARGIN_TOP +
-      INTERPRETATION_BLOCK_HEIGHT +
-      28,
-    maxY: height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN - FLOWER_TO_LEGEND_GAP,
+    minX: layout.contentX + 14,
+    maxX: layout.contentX + layout.contentW - 14,
+    minY: layout.flowerTop,
+    maxY: Math.max(layout.flowerTop + 40, layout.flowerBottom),
   };
 
   // Build evenly spaced anchors for all indicators inside the flower area.
@@ -628,7 +686,7 @@ function isEssDataAvailable(latest, indicatorKey) {
   return Number.isFinite(numericValue);
 }
 
-function drawLegend(latest) {
+function drawLegend(latest, layout) {
   // Show V-Dem indicators on the left and ESS indicators on the right.
   const vDemIndicators = indicatorConfig.filter((item) =>
     item.key.startsWith("v2x_"),
@@ -637,19 +695,18 @@ function drawLegend(latest) {
     item.key.startsWith("stf"),
   );
 
-  const panelX = 24;
-
-  const panelY = height - LEGEND_BLOCK_HEIGHT - LEGEND_MARGIN;
-  const panelW = width - 48;
-  const panelH = LEGEND_BLOCK_HEIGHT;
+  const panelX = layout.contentX;
+  const panelY = layout.legendTop + 8;
+  const panelW = layout.contentW;
+  const panelH = layout.frameY + layout.frameH - panelY - 10;
   const startX = panelX + 18;
   const contentWidth = panelW - 36;
   const columnWidth = contentWidth / 2;
   const titlesY = panelY + 28;
   const rowsStartY = titlesY + LEGEND_TITLE_TO_ROWS_GAP;
-  const rowHeight = 48;
-
-  drawUiPanel(panelX, panelY, panelW, panelH, 18, "#000000", "#ffffff");
+  const maxRows = Math.max(vDemIndicators.length, essIndicators.length);
+  const availableRowsHeight = panelH - (rowsStartY - panelY) - 16;
+  const rowHeight = Math.max(34, availableRowsHeight / Math.max(1, maxRows));
 
   stroke("#2f3850");
   strokeWeight(1);
@@ -666,11 +723,11 @@ function drawLegend(latest) {
   fill("#f1f5ff");
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_TITLE);
-  text("Wissenschfliche Beurteilungen", startX, titlesY);
+  text("Demokratie-Scores", startX, titlesY);
   text("Volksempfinden", startX + columnWidth, titlesY);
   textStyle(NORMAL);
 
-  const rows = Math.max(vDemIndicators.length, essIndicators.length);
+  const rows = maxRows;
 
   for (let row = 0; row < rows; row++) {
     drawLegendRow(
@@ -809,10 +866,10 @@ function getRegimeInterpretation(latest) {
   };
 }
 
-function drawInterpretationPanel(result) {
-  const panelX = 24;
-  const panelY = HEADER_BLOCK_HEIGHT + INTERPRETATION_MARGIN_TOP;
-  const panelW = width - 48;
+function drawInterpretationPanel(result, layout) {
+  const panelX = layout.contentX;
+  const panelY = layout.interpretationY;
+  const panelW = layout.contentW;
   const panelH = INTERPRETATION_BLOCK_HEIGHT;
 
   noStroke();
@@ -820,14 +877,14 @@ function drawInterpretationPanel(result) {
 
   fill("#e8ecf8");
   textStyle(BOLD);
-  textSize(28);
-  const interpretationBodyY = panelY + 14;
+  textSize(18);
+  const interpretationBodyY = panelY + 16;
   text(
     result.interpretation,
     panelX + 16,
     interpretationBodyY,
     panelW - 32,
-    panelH - 16,
+    panelH - 22,
   );
 }
 
@@ -855,7 +912,7 @@ function drawLegendRow(configItem, baseX, rowsStartY, row, rowHeight, latest) {
   fill("#e8ecf8");
   textStyle(BOLD);
   textSize(LEGEND_FONT_SIZE_LABEL);
-  text(configItem.label, baseX + 34, y - 9);
+  text(configItem.label, baseX + 34, y - 8);
 
   // Show real flower count currently rendered in the garden.
   fill("#98a1b7");
@@ -902,27 +959,44 @@ function drawLoadingState() {
 
 function drawNoMatchState() {
   // Message when no country fits the filter values.
+  const panelW = Math.min(width - 80, 760);
+  const panelH = 250;
+  const panelX = (width - panelW) / 2;
+  const panelY = (height - panelH) / 2 - 28;
+
+  drawUiPanel(panelX, panelY, panelW, panelH, 20, "#000000", "#ffffff");
+
   fill(220);
   noStroke();
   textAlign(CENTER, CENTER);
-  textSize(FONT_SIZE_SECTION);
+  textSize(22);
+  textStyle(BOLD);
   text(
     "Keine Länder entsprechen den aktuellen Parametern.",
     width / 2,
-    height / 2 - 24,
+    panelY + 58,
   );
 
-  textSize(18);
+  textSize(16);
   fill("#b8bcc8");
+  textAlign(CENTER, TOP);
+  const lineHeight = 28;
+  const startY = panelY + 106;
+
   text(
-    "Zufriedenheit mit der Wirtschaft: " +
-      params.stfeco +
-      " | Zufriedenheit mit dem Leben: " +
-      params.stflife +
-      " | Zufriedenheit mit der Regierung: " +
-      params.stfgov,
+    "Zufriedenheit mit der Wirtschaft: " + params.stfeco,
     width / 2,
-    height / 2 + 20,
+    startY,
+  );
+  text(
+    "Zufriedenheit mit dem Leben: " + params.stflife,
+    width / 2,
+    startY + lineHeight,
+  );
+  text(
+    "Zufriedenheit mit der Regierung: " + params.stfgov,
+    width / 2,
+    startY + lineHeight * 2,
   );
 }
 
