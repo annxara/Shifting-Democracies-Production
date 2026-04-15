@@ -110,7 +110,7 @@ const indicatorConfig = [
   {
     key: "v2x_partipdem",
     label: "Partizipative Demokratie",
-    image: "pictures/forgetmenot_dodgerblue.png",
+    image: "pictures/forgetmenot_partipdem.png",
   },
   {
     key: "v2x_delibdem",
