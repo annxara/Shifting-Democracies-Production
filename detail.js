@@ -23,7 +23,7 @@ const CLUSTER_DELAY_MS = 2000;
 const CLUSTER_MOVE_DURATION_MS = 4200;
 const HEADER_BLOCK_HEIGHT = 108;
 const INTERPRETATION_BLOCK_HEIGHT = 98;
-const INTERPRETATION_MARGIN_TOP = 12;
+const INTERPRETATION_MARGIN_TOP = 4;
 const LEGEND_BLOCK_HEIGHT = 272;
 const LEGEND_MARGIN = 34;
 const FLOWER_TO_LEGEND_GAP = 60;
@@ -322,8 +322,11 @@ function drawHeader(country, latest, regimeInfo, layout) {
   const leftY = panelY + 14 + HEADER_LEFT_TEXT_Y_OFFSET;
   const leftW = typeCardX - leftX - 16;
   const rightX = typeCardX + 14;
-  const rowTopY = leftY;
-  const rowBottomY = leftY + HEADER_TITLE_TO_SUBTEXT_GAP - 2;
+  const titleToYearGap = HEADER_TITLE_TO_SUBTEXT_GAP - 2;
+  const rowBottomY = typeCardY + typeCardH - FONT_SIZE_BODY;
+  const rowTopY = rowBottomY - titleToYearGap;
+  const fixedTypeTopY = leftY;
+  const fixedTypeBottomY = leftY + titleToYearGap;
 
   drawUiPanel(typeCardX, typeCardY, typeCardW, typeCardH, 16, "#000000", "#ffffff");
 
@@ -343,9 +346,9 @@ function drawHeader(country, latest, regimeInfo, layout) {
   noStroke();
   fill("#98a1b7");
   textStyle(NORMAL);
-  const typeLabelSize = 13;
+  const typeLabelSize = 16;
   textSize(typeLabelSize);
-  const typeLabelY = rowTopY + Math.max(0, titleSize - typeLabelSize);
+  const typeLabelY = fixedTypeTopY + Math.max(0, titleSize - typeLabelSize);
   text("Demokratietyp", rightX, typeLabelY);
 
   textStyle(NORMAL);
@@ -359,9 +362,9 @@ function drawHeader(country, latest, regimeInfo, layout) {
   text(
     regimeInfo.regimeType,
     rightX,
-    rowBottomY,
+    fixedTypeBottomY,
     typeCardW - 28,
-    typeCardH - (rowBottomY - typeCardY),
+    typeCardH - (fixedTypeBottomY - typeCardY),
   );
 }
 
