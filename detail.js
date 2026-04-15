@@ -105,7 +105,7 @@ const indicatorConfig = [
   {
     key: "v2x_polyarchy",
     label: "Elektorale Demokratie",
-    image: "pictures/forgetmenot_brightcyan.png",
+    image: "pictures/forgetmenot_polyarchy.png",
   },
   {
     key: "v2x_partipdem",
