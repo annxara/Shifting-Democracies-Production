@@ -37,6 +37,7 @@ const LEGEND_FONT_SIZE_VALUE = 14;
 const LEGEND_FLOWER_SIZE = 28;
 const FLOWER_RENDER_SCALE = 1.52;
 const HEADER_TITLE_TO_SUBTEXT_GAP = 46;
+const HEADER_LEFT_TEXT_Y_OFFSET = 6;
 const INTERPRETATION_TITLE_TO_BODY_GAP = 22;
 const LEGEND_TITLE_TO_ROWS_GAP = 42;
 
@@ -318,7 +319,7 @@ function drawHeader(country, latest, regimeInfo, layout) {
   const typeCardH = panelH - panelPadding * 2;
 
   const leftX = panelX + 22;
-  const leftY = panelY + 14;
+  const leftY = panelY + 14 + HEADER_LEFT_TEXT_Y_OFFSET;
   const leftW = typeCardX - leftX - 16;
   const rightX = typeCardX + 14;
   const rowTopY = leftY;
